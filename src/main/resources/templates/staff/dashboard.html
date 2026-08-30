@@ -1,0 +1,461 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head>
+  <meta charset="UTF-8">
+  <title>Staff Officer Dashboard - Date-Wise Meeting Assignments | KAAC</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" th:href="@{/public/css/style.css}" href="/public/css/style.css">
+  <style>
+    .staff-summary-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+      gap: 16px;
+      margin-bottom: 20px;
+    }
+    .staff-stat-card {
+      background: #ffffff;
+      border: 1px solid #059669;
+      border-radius: 12px;
+      padding: 16px 20px;
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.04);
+      transition: transform 0.15s ease, box-shadow 0.15s ease;
+    }
+    .staff-stat-card:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 4px 6px -1px rgba(0,0,0,0.08);
+    }
+    .staff-avatar-circle {
+      width: 48px;
+      height: 48px;
+      border-radius: 10px;
+      background: #e0f2fe;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.5rem;
+      color: #0284c7;
+      flex-shrink: 0;
+    }
+    .filter-section-card {
+      background: #ffffff;
+      border: 1px solid #e2e8f0;
+      border-radius: 10px;
+      padding: 14px 20px;
+      margin-bottom: 24px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 16px;
+      box-shadow: 0 1px 2px rgba(0,0,0,0.03);
+    }
+    .date-group-card {
+      background: #ffffff;
+      border: 1px solid #e2e8f0;
+      border-radius: 12px;
+      margin-bottom: 24px;
+      overflow: hidden;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+    }
+    .date-group-header {
+      background: #ffffff;
+      padding: 14px 20px;
+      border-bottom: 1px solid #f1f5f9;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .assigned-pill-badge {
+      background: #2563eb;
+      color: #ffffff;
+      font-size: 0.75rem;
+      font-weight: 800;
+      padding: 4px 14px;
+      border-radius: 9999px;
+      letter-spacing: 0.05em;
+    }
+    .staff-officer-pill {
+      background: #e0f2fe;
+      color: #0369a1;
+      border: 1px solid #bae6fd;
+      font-size: 0.82rem;
+      font-weight: 700;
+      padding: 3px 10px;
+      border-radius: 9999px;
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+    }
+    .mode-badge-physical {
+      background: #e0f2fe;
+      color: #0284c7;
+      border: 1px solid #bae6fd;
+      font-size: 0.75rem;
+      font-weight: 700;
+      padding: 2px 8px;
+      border-radius: 4px;
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+    }
+    .mode-badge-virtual {
+      background: #f3e8ff;
+      color: #9333ea;
+      border: 1px solid #e9d5ff;
+      font-size: 0.75rem;
+      font-weight: 700;
+      padding: 2px 8px;
+      border-radius: 4px;
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+    }
+    .status-badge-scheduled {
+      background: #2563eb;
+      color: #ffffff;
+      font-size: 0.7rem;
+      font-weight: 700;
+      padding: 2px 8px;
+      border-radius: 9999px;
+      display: inline-block;
+      margin-top: 4px;
+    }
+    .status-badge-completed {
+      background: #16a34a;
+      color: #ffffff;
+      font-size: 0.7rem;
+      font-weight: 700;
+      padding: 2px 8px;
+      border-radius: 9999px;
+      display: inline-block;
+      margin-top: 4px;
+    }
+    .status-badge-cancelled {
+      background: #dc2626;
+      color: #ffffff;
+      font-size: 0.7rem;
+      font-weight: 700;
+      padding: 2px 8px;
+      border-radius: 9999px;
+      display: inline-block;
+      margin-top: 4px;
+    }
+    .chairperson-name {
+      color: #c2410c;
+      font-weight: 700;
+      font-size: 0.9rem;
+    }
+    .btn-schedule-nav {
+      background: #064e3b;
+      color: #ffffff;
+      border: 1px solid #047857;
+      padding: 8px 16px;
+      border-radius: 6px;
+      font-size: 0.88rem;
+      font-weight: 700;
+      text-decoration: none;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      transition: background 0.15s ease;
+    }
+    .btn-schedule-nav:hover {
+      background: #047857;
+      color: #ffffff;
+    }
+  </style>
+</head>
+<body>
+  <!-- Top Government Bar -->
+  <div class="gov-topbar">
+    <div class="flag-tag">
+      <span>🏛️</span>
+      <span>SIXTH SCHEDULE AUTONOMOUS COUNCIL</span>
+    </div>
+    <div style="display: flex; gap: 16px; align-items: center;">
+      <span>📍 Diphu, Karbi Anglong, Assam</span>
+    </div>
+  </div>
+
+  <!-- Main Header -->
+  <header class="main-header">
+    <div class="header-container">
+      <div class="brand-section">
+        <a href="/" style="text-decoration: none; color: inherit; display: flex; align-items: center; gap: 16px;">
+          <div class="council-crest">🏛️</div>
+          <div class="brand-titles">
+            <h1>KARBI ANGLONG AUTONOMOUS COUNCIL</h1>
+            <div class="sub-title">COUNCIL SECRETARIAT • MEETING MANAGEMENT SYSTEM</div>
+          </div>
+        </a>
+      </div>
+      <!-- Dynamic Session Panel for Authenticated Officer vs Public View Mode -->
+      <div th:if="${activeUser != null}" class="session-panel" style="display: flex; align-items: center; gap: 14px;">
+        <div class="current-user-info" style="text-align: right;">
+          <div style="font-size: 0.72rem; color: #a7f3d0; text-transform: uppercase; font-weight: 700; letter-spacing: 0.5px;">Active User</div>
+
+          <div class="user-name" id="current-user-name" style="font-weight: 700; font-size: 0.95rem; color: #ffffff;"
+               th:text="${activeUser?.fullName}">Longki Rongpi</div>
+
+          <div id="current-user-designation" style="font-size: 0.75rem; color: #cbd5e1; max-width: 220px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;"
+               th:text="${activeUser?.designation}">Executive Member, IT & Council Affairs</div>
+        </div>
+
+        <span class="role-badge"
+              th:classappend="${activeUser?.role != null ? #strings.toLowerCase(activeUser.role.toString()) : ''}"
+              th:text="${activeUser?.role}"
+              id="current-user-role" style="font-weight: 800; font-size: 0.75rem; letter-spacing: 0.5px; padding: 4px 10px; border-radius: 6px;">ADMIN</span>
+
+        <a href="/logout" class="btn btn-secondary btn-sm" style="font-size: 0.78rem; padding: 5px 10px; background: rgba(255,255,255,0.15); color: #fff; border: 1px solid rgba(255,255,255,0.25); border-radius: 6px; text-decoration: none;" title="End Active Session">🚪 Logout</a>
+      </div>
+
+      <div th:if="${activeUser == null}" class="session-panel" style="display: flex; align-items: center; gap: 12px;">
+        <div style="text-align: right;">
+          <div style="font-size: 0.72rem; color: #fde68a; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px;">Public View Mode</div>
+          <div style="font-size: 0.8rem; color: #cbd5e1;">Read-Only Council Registry</div>
+        </div>
+        <a href="/login" class="btn btn-gold" style="font-size: 0.84rem; padding: 7px 14px; text-decoration: none; font-weight: 700; display: inline-flex; align-items: center; gap: 6px;">🔐 Officer Login</a>
+      </div>
+  </header>
+
+  <!-- Navigation Bar -->
+  <nav class="nav-tab-bar">
+    <div class="nav-container">
+      <div class="tab-group">
+        <a href="/" class="nav-btn">🏛️ Meeting Dashboard</a>
+        <a href="/staff/dashboard" class="nav-btn active">📋 Staff Dashboard</a>
+        <a href="/departments" class="nav-btn">🏢 Departments</a>
+        <a href="/rooms" class="nav-btn">🏛️ Meeting Rooms</a>
+        <a href="/users" class="nav-btn">👥 Users</a>
+        <a href="/admin/dashboard" class="nav-btn" sec:authorize="hasRole('ADMIN')">⚙️ Admin Console</a>
+      </div>
+      <div class="quick-action-group">
+        <a href="/meetings/new" class="btn-schedule-nav">➕ Schedule Meeting</a>
+      </div>
+    </div>
+  </nav>
+
+  <main class="app-main">
+    <div class="page-title-row" style="margin-bottom: 16px;">
+      <div>
+        <h2 style="font-size: 1.3rem; font-weight: 800; color: #0f172a; display: flex; align-items: center; gap: 8px;">
+          <span>📋</span> Staff Officer Meeting Assignments (Date-Wise)
+        </h2>
+        <p style="font-size: 0.88rem; color: #64748b; margin-top: 2px;">
+          Real-time matrix of council meetings assigned to each staff coordinator broken down by date and schedule.
+        </p>
+      </div>
+    </div>
+
+    <!-- Staff Officer Summary Cards -->
+    <div class="staff-summary-grid">
+      <div class="staff-stat-card" th:each="staff : ${staffMembers}">
+        <div class="staff-avatar-circle">👤</div>
+        <div>
+          <div style="font-size: 1.05rem; font-weight: 700; color: #0f172a;"
+               th:text="${staff.fullName}">Staff Name</div>
+
+          <div style="font-size: 0.82rem; color: #64748b; margin-bottom: 6px;"
+               th:text="${staff.designation}">Designation</div>
+
+          <div style="font-size: 0.82rem; color: #334155; display: flex; gap: 12px;">
+            <span>📋 <strong th:text="${assignedCounts.get(staff.id) ?: 0}">0</strong> Assigned</span>
+            <span>📅 <strong th:text="${activeDatesCounts.get(staff.id) ?: 0}">0</strong> Active Dates</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Filter Bar -->
+    <!-- Filter Bar -->
+    <div class="filter-section-card">
+      <div>
+        <div style="font-size: 0.95rem; font-weight: 700; color: #1e293b;">Filter Date-Wise Staff Assignments</div>
+        <div style="font-size: 0.82rem; color: #64748b;">Inspect workload by specific officer, date, or meeting type (Physical / Virtual)</div>
+      </div>
+
+      <form id="filterForm" onsubmit="applyFrontendFilters(event)" style="display: flex; gap: 10px; align-items: center; flex-wrap: wrap;">
+
+        <!-- DYNAMIC STAFF DROPDOWN -->
+        <select id="filterStaff" class="form-control" style="width: auto; padding: 6px 12px; font-size: 0.85rem;">
+          <option value="">All Staff Members</option>
+          <option th:each="staff : ${staffMembers}"
+                  th:value="${staff.id}"
+                  th:text="${staff.fullName}">Staff Name</option>
+        </select>
+
+        <select id="filterType" class="form-control" style="width: auto; padding: 6px 12px; font-size: 0.85rem;">
+          <option value="">All Meeting Types</option>
+          <option value="PHYSICAL">Physical Meetings</option>
+          <option value="VIRTUAL">Virtual Meetings</option>
+        </select>
+
+        <input type="date" id="filterDate" class="form-control" style="width: auto; padding: 6px 12px; font-size: 0.85rem;">
+
+        <button type="submit" class="btn btn-primary btn-sm" style="background: #064e3b; border-color: #064e3b; padding: 7px 16px;">Filter</button>
+
+        <button type="button" class="btn btn-secondary btn-sm" style="padding: 7px 16px;" onclick="resetFilters()">Reset</button>
+      </form>
+    </div>
+    <!-- Dynamic Date Group Loop -->
+    <div class="date-group-card" th:each="entry : ${meetingsByDate}" th:id="'group-' + ${entry.key}">
+      <div class="date-group-header">
+        <div>
+          <span style="font-size: 1.1rem; margin-right: 4px;">📅</span>
+          <strong style="font-size: 1.05rem; color: #0f172a;">Date: <span th:text="${entry.key}">2026-08-28</span></strong>
+          <div style="font-size: 0.8rem; color: #64748b; margin-top: 2px;">Total meetings assigned on this day: <span th:text="${entry.value.size()}">0</span></div>
+        </div>
+        <div>
+          <span class="assigned-pill-badge"><span th:text="${entry.value.size()}">0</span> ASSIGNED</span>
+        </div>
+      </div>
+      <div class="table-responsive">
+        <table class="council-table">
+          <thead>
+          <tr>
+            <th style="width: 18%;">ASSIGNED STAFF OFFICER</th>
+            <th style="width: 32%;">MEETING SUBJECT & DEPARTMENT</th>
+            <th style="width: 14%;">TIME SLOT</th>
+            <th style="width: 18%;">MODE & VENUE / LINK</th>
+            <th style="width: 18%;">PRESIDING CHAIRPERSON</th>
+            <th style="text-align: right; width: 10%;">ACTIONS</th>
+          </tr>
+          </thead>
+          <tbody>
+          <!-- Dynamic Meeting Row Loop -->
+          <!-- FIX 1: Added class="meeting-row" and th:data-* attributes here -->
+          <tr th:each="meeting : ${entry.value}"
+              class="meeting-row"
+              th:data-staff="${meeting.assignedStaff?.id}"
+              th:data-type="${meeting.meetingType}"
+              th:data-date="${entry.key}">
+
+            <!-- Assigned Staff -->
+            <td>
+              <div class="staff-officer-pill">👤 <span th:text="${meeting.assignedStaff?.fullName ?: 'Unassigned'}">Staff Name</span></div>
+              <div style="font-size: 0.75rem; color: #64748b; margin-top: 4px;" th:text="${meeting.assignedStaff?.email ?: 'N/A'}">email@kaac.gov.in</div>
+            </td>
+
+            <!-- Subject & Department -->
+            <td>
+              <div style="font-weight: 700; color: #0f172a; font-size: 0.92rem;" th:text="${meeting.title}">Meeting Subject</div>
+              <div style="font-size: 0.8rem; color: #64748b; margin-top: 2px;" th:text="${meeting.department?.name}">Department Name</div>
+            </td>
+
+            <!-- Time Slot & Status -->
+            <td>
+              <div style="font-weight: 700; font-size: 0.9rem; color: #1e293b;" th:text="${meeting.startTime} + ' - ' + ${meeting.endTime}">00:00 - 00:00</div>
+              <span th:if="${meeting.status != null and meeting.status.name() == 'SCHEDULED'}" class="status-badge-scheduled">SCHEDULED</span>
+              <span th:if="${meeting.status != null and meeting.status.name() == 'COMPLETED'}" class="status-badge-completed">COMPLETED</span>
+              <span th:if="${meeting.status != null and meeting.status.name() == 'CANCELLED'}" class="status-badge-cancelled">CANCELLED</span>
+              <span th:if="${meeting.status != null and meeting.status.name() == 'IN_PROGRESS'}" class="status-badge-scheduled" style="background: #eab308;">IN PROGRESS</span>
+            </td>
+
+            <!-- Mode & Venue -->
+            <td>
+              <!-- Virtual Display -->
+              <!-- FIX 2: Removed .name() from meetingType here -->
+              <div th:if="${meeting.meetingType != null and meeting.meetingType.name() == 'VIRTUAL'}">
+                <span class="mode-badge-virtual">💻 Virtual</span>
+                <div style="font-weight: 600; font-size: 0.85rem; color: #9333ea; margin-top: 3px;">Online Video Call</div>
+                <a th:if="${meeting.virtualLink != null}" th:href="${meeting.virtualLink}" target="_blank" style="font-size: 0.75rem; color: #0284c7; text-decoration: none; font-weight: 600;">🔗 Join Call</a>
+              </div>
+
+              <!-- Physical Display -->
+              <!-- FIX 2: Removed .name() from meetingType here -->
+              <div th:if="${meeting.meetingType != null and meeting.meetingType.name() == 'PHYSICAL'}">
+                <span class="mode-badge-physical">🏛️ Physical</span>
+                <div style="font-weight: 600; font-size: 0.85rem; color: #1e293b; margin-top: 3px;" th:text="${meeting.meetingRoom?.name}">Room Name</div>
+                <div style="font-size: 0.75rem; color: #64748b;" th:text="${meeting.meetingRoom?.roomNumber ?: ''}">Room Number</div>
+              </div>
+            </td>
+
+            <!-- Presiding Chairperson -->
+            <td>
+              <div class="chairperson-name" th:text="${meeting.chairperson?.fullName}">Chairperson Name</div>
+              <div style="font-size: 0.75rem; color: #64748b;" th:text="${meeting.chairperson?.designation}">Designation</div>
+            </td>
+
+            <!-- Actions -->
+            <td style="text-align: right; white-space: nowrap;">
+              <a th:href="@{/meetings/view/{id}(id=${meeting.id})}" class="btn btn-secondary btn-sm" style="padding: 4px 10px; font-size: 0.8rem;">View</a>
+              <a th:href="@{/meetings/notice/{id}(id=${meeting.id})}" class="btn btn-gold btn-sm" style="padding: 4px 10px; font-size: 0.8rem; background: #d97706; color: #fff;">Notice</a>
+            </td>
+
+          </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- Empty State Fallback -->
+    <!-- FIX 3: Replaced th:if with id="empty-state-card" and display: none -->
+    <div id="empty-state-card" class="date-group-card" style="display: none; padding: 40px; text-align: center;">
+      <div style="font-size: 2rem; margin-bottom: 10px;">📭</div>
+      <h3 style="color: #1e293b; margin-bottom: 5px;">No Assignments Found</h3>
+      <p style="color: #64748b; font-size: 0.9rem;">There are currently no meetings scheduled based on your selected filters.</p>
+    </div>
+
+  </main>
+
+  <script>
+    function applyFrontendFilters(event) {
+      if (event) event.preventDefault(); // Stop page from reloading
+
+      const selectedStaffId = document.getElementById('filterStaff').value;
+      const selectedType = document.getElementById('filterType').value;
+      const selectedDate = document.getElementById('filterDate').value;
+
+      const dateGroups = document.querySelectorAll('.date-group-card:not(#empty-state-card)');
+      let totalVisibleMeetings = 0;
+
+      dateGroups.forEach(group => {
+        const rows = group.querySelectorAll('.meeting-row');
+        let groupVisibleCount = 0;
+
+        rows.forEach(row => {
+          const rowStaffId = row.getAttribute('data-staff') || '';
+          const rowType = row.getAttribute('data-type') || '';
+          const rowDate = row.getAttribute('data-date') || '';
+
+          // Check if row matches filters (empty filter means "All")
+          const matchesStaff = !selectedStaffId || rowStaffId === selectedStaffId;
+          const matchesType = !selectedType || rowType === selectedType;
+          const matchesDate = !selectedDate || rowDate === selectedDate;
+
+          if (matchesStaff && matchesType && matchesDate) {
+            row.style.display = ''; // Show row
+            groupVisibleCount++;
+            totalVisibleMeetings++;
+          } else {
+            row.style.display = 'none'; // Hide row
+          }
+        });
+
+        // If a date group has no visible rows, hide the whole date card
+        if (groupVisibleCount === 0) {
+          group.style.display = 'none';
+        } else {
+          group.style.display = '';
+          // Update the counters on the card header to reflect the filtered number
+          group.querySelector('.assigned-pill-badge span').textContent = groupVisibleCount;
+          group.querySelector('.date-group-header div div span').textContent = groupVisibleCount;
+        }
+      });
+
+      // Show empty state graphic if nothing matches
+      document.getElementById('empty-state-card').style.display = (totalVisibleMeetings === 0) ? 'block' : 'none';
+    }
+
+    function resetFilters() {
+      document.getElementById('filterStaff').value = '';
+      document.getElementById('filterType').value = '';
+      document.getElementById('filterDate').value = '';
+      applyFrontendFilters(); // Re-run filter to show everything
+    }
+  </script>
+</body>
+</html>

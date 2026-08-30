@@ -1,0 +1,225 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Officer Login - KAAC Meeting Management</title>
+    <link rel="stylesheet" th:href="@{/css/style.css}" href="/css/style.css">
+    <style>
+        .login-container {
+            max-width: 440px;
+            margin: 40px auto;
+            padding: 0 16px;
+        }
+        .login-card {
+            background: #ffffff;
+            border-radius: 8px;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -2px rgba(0, 0, 0, 0.05);
+            border: 1px solid var(--border);
+            border-top: 4px solid var(--primary);
+            overflow: hidden;
+        }
+        .login-header {
+            padding: 24px 24px 16px;
+            text-align: center;
+            border-bottom: 1px solid var(--border);
+        }
+        .login-crest {
+            font-size: 2.2rem;
+            margin-bottom: 8px;
+        }
+        .login-body {
+            padding: 24px;
+        }
+        .demo-creds {
+            margin-top: 20px;
+            padding-top: 16px;
+            border-top: 1px dashed var(--border-dark);
+        }
+        .demo-user-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 8px 10px;
+            background: #f8fafc;
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            margin-bottom: 6px;
+            cursor: pointer;
+            font-size: 0.85rem;
+            transition: all 0.15s ease;
+        }
+        .demo-user-item:hover {
+            background: var(--primary-light);
+            border-color: var(--primary-border);
+        }
+        .alert {
+            padding: 10px 14px;
+            border-radius: 6px;
+            margin-bottom: 16px;
+            font-size: 0.88rem;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .alert-danger {
+            background-color: #fee2e2;
+            color: #991b1b;
+            border: 1px solid #fca5a5;
+        }
+        .alert-success {
+            background-color: #dcfce7;
+            color: #166534;
+            border: 1px solid #86efac;
+        }
+    </style>
+</head>
+<body>
+    <!-- Top Government Bar -->
+    <div class="gov-topbar">
+        <span class="flag-tag">🇮🇳 Autonomous Sixth Schedule Council</span>
+        <span>Diphu, Karbi Anglong, Assam</span>
+    </div>
+
+    <!-- Main Header -->
+    <header class="main-header">
+        <div class="header-container">
+            <div class="brand-section">
+                <a href="/" style="text-decoration: none; color: inherit; display: flex; align-items: center; gap: 16px;">
+                    <div class="council-crest">🏛️</div>
+                    <div class="brand-titles">
+                        <h1>Karbi Anglong Autonomous Council</h1>
+                        <div class="sub-title">Meeting Scheduling & Protocol Automation System</div>
+                    </div>
+                </a>
+            </div>
+            <div class="session-panel" style="display: flex; align-items: center; gap: 12px;">
+                <div style="text-align: right;">
+                    <div style="font-size: 0.72rem; color: #fde68a; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px;">Public View Mode</div>
+                    <div style="font-size: 0.8rem; color: #cbd5e1;">Read-Only Council Registry</div>
+                </div>
+                <a href="/" class="btn btn-secondary" style="font-size: 0.84rem; padding: 7px 14px; text-decoration: none; font-weight: 700; color: #ffffff; background: rgba(255,255,255,0.15); border: 1px solid rgba(255,255,255,0.25); border-radius: 6px;">← Back to Dashboard</a>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Container -->
+    <main class="app-main">
+        <div class="login-container">
+            <div class="login-card">
+                <div class="login-header">
+                    <div class="login-crest">🔐</div>
+                    <h2 style="font-size: 1.25rem; font-weight: 700; color: var(--secondary); margin-bottom: 4px;">Officer Authentication</h2>
+                    <p style="color: var(--text-muted); font-size: 0.85rem;">Sign in with your council credentials</p>
+                </div>
+
+                <div class="login-body">
+                    <!-- Thymeleaf Server Messages -->
+                    <div th:if="${param.error}" class="alert alert-danger">
+                        <span>⚠️</span>
+                        <span>Invalid username or password. Please try again.</span>
+                    </div>
+                    <div th:if="${param.logout}" class="alert alert-success">
+                        <span>✅</span>
+                        <span>You have been logged out successfully.</span>
+                    </div>
+
+                    <!-- Dynamic / Express Messages Placeholder -->
+                    <!-- Auth Messages -->
+
+                    <form action="/login" method="POST" id="loginForm">
+                        <input type="hidden" th:if="${_csrf != null}" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />
+                        <input type="hidden" name="redirect" id="redirectInput" value="" />
+                        <div class="form-group">
+                            <label class="form-label" for="username">Username</label>
+                            <input type="text" id="username" name="username" class="form-control" required autofocus placeholder="Enter officer username">
+                        </div>
+
+                        <div class="form-group">
+                            <label class="form-label" for="password">Password</label>
+                            <input type="password" id="password" name="password" class="form-control" required placeholder="Enter password">
+                        </div>
+
+                        <button type="submit" class="btn btn-primary" style="width: 100%; margin-top: 8px; padding: 10px;">
+                            Sign In to Council Portal
+                        </button>
+                    </form>
+
+                    <!-- Demo Credentials for Quick Testing -->
+                    <div class="demo-creds">
+                        <div style="font-size: 0.78rem; font-weight: 700; color: var(--text-muted); text-transform: uppercase; margin-bottom: 8px;">
+                            Quick Demo Logins (Click to autofill & sign in):
+                        </div>
+                        <div class="demo-user-item" onclick="setLogin('admin', 'password123')">
+                            <div>
+                                <strong style="color: #0f172a;">admin</strong>
+                                <span style="color: #64748b; font-size: 0.78rem; display: block;">Longki Rongpi (Secretary to Council)</span>
+                            </div>
+                            <span class="role-badge admin">ADMIN</span>
+                        </div>
+                        <div class="demo-user-item" onclick="setLogin('staff_biren', 'password123')">
+                            <div>
+                                <strong style="color: #0f172a;">staff_biren</strong>
+                                <span style="color: #64748b; font-size: 0.78rem; display: block;">Biren Teron (Protocol Officer)</span>
+                            </div>
+                            <span class="role-badge staff">STAFF</span>
+                        </div>
+                        <div class="demo-user-item" onclick="setLogin('staff_kalyan', 'password123')">
+                            <div>
+                                <strong style="color: #0f172a;">staff_kalyan</strong>
+                                <span style="color: #64748b; font-size: 0.78rem; display: block;">Kalyan Ingti (Asst Protocol Officer)</span>
+                            </div>
+                            <span class="role-badge staff">STAFF</span>
+                        </div>
+                        <div class="demo-user-item" onclick="setLogin('cem_tuliram', 'password123')">
+                            <div>
+                                <strong style="color: #0f172a;">cem_tuliram</strong>
+                                <span style="color: #64748b; font-size: 0.78rem; display: block;">Hon. Tuliram Ronghang (CEM)</span>
+                            </div>
+                            <span class="role-badge chairperson">CHAIRPERSON</span>
+                        </div>
+                    </div>
+
+                    <div style="text-align: center; margin-top: 16px;">
+                        <a href="/" style="font-size: 0.85rem; color: var(--primary); text-decoration: none; font-weight: 600;">
+                            ← Back to Dashboard
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <footer class="main-footer" style="margin-top: auto; padding: 20px 24px; text-align: center; background: #ffffff; border-top: 1px solid var(--border); font-size: 0.85rem; color: var(--text-muted);">
+        <div>&copy; 2026 Karbi Anglong Autonomous Council (KAAC). All rights reserved.</div>
+    </footer>
+
+    <script>
+        function setLogin(u, p) {
+            document.getElementById('username').value = u;
+            document.getElementById('password').value = p;
+        }
+
+        // Handle URL error/logout/redirect parameters seamlessly
+        const urlParams = new URLSearchParams(window.location.search);
+        const redirectParam = urlParams.get('redirect');
+        if (redirectParam && document.getElementById('redirectInput')) {
+            document.getElementById('redirectInput').value = redirectParam;
+        }
+
+        if (urlParams.get('error') && !document.querySelector('.alert-danger')) {
+            const container = document.getElementById('loginForm');
+            const alertDiv = document.createElement('div');
+            alertDiv.className = 'alert alert-danger';
+            alertDiv.innerHTML = '<span>⚠️</span><span>Invalid username or password. Please try again.</span>';
+            container.parentNode.insertBefore(alertDiv, container);
+        } else if (urlParams.get('logout') && !document.querySelector('.alert-success')) {
+            const container = document.getElementById('loginForm');
+            const alertDiv = document.createElement('div');
+            alertDiv.className = 'alert alert-success';
+            alertDiv.innerHTML = '<span>✅</span><span>You have been logged out successfully.</span>';
+            container.parentNode.insertBefore(alertDiv, container);
+        }
+    </script>
+</body>
+</html>

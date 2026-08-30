@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.w3.org/1999/xhtml">
+<head>
+  <meta charset="UTF-8">
+  <title>Council Users Directory | KAAC Meeting Management</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" th:href="@{/public/css/style.css}" href="/public/css/style.css">
+</head>
+<body>
+  <header class="gov-topbar">
+    <div class="flag-tag">
+      <span>🏛️</span>
+      <span>GOVERNMENT OF ASSAM • SIXTH SCHEDULE AUTONOMOUS COUNCIL</span>
+    </div>
+    <div style="display: flex; gap: 16px; align-items: center;">
+      <span>📍 Diphu, Karbi Anglong, Assam</span>
+      <span>|</span>
+      <span>H2 Database Engine: <strong style="color: #6ee7b7;">ACTIVE</strong></span>
+    </div>
+  </header>
+
+  <header class="main-header">
+    <div class="header-container">
+      <div class="brand-section">
+        <a href="/" style="text-decoration: none; color: inherit; display: flex; align-items: center; gap: 16px;">
+          <div class="council-crest">🏛️</div>
+          <div class="brand-titles">
+            <h1>KARBI ANGLONG AUTONOMOUS COUNCIL</h1>
+            <div class="sub-title">COUNCIL MEMBERS & PERSONNEL DIRECTORY</div>
+            <span class="dept-tag">Spring MVC & H2 Database Relational Architecture</span>
+          </div>
+        </a>
+      </div>
+      <!-- Dynamic Session Panel for Authenticated Officer vs Public View Mode -->
+      <div th:if="${activeUser != null}" class="session-panel" style="display: flex; align-items: center; gap: 14px;">
+        <div class="current-user-info" style="text-align: right;">
+          <div style="font-size: 0.72rem; color: #a7f3d0; text-transform: uppercase; font-weight: 700; letter-spacing: 0.5px;">Active User</div>
+
+          <div class="user-name" id="current-user-name" style="font-weight: 700; font-size: 0.95rem; color: #ffffff;"
+               th:text="${activeUser?.fullName}">Longki Rongpi</div>
+
+          <div id="current-user-designation" style="font-size: 0.75rem; color: #cbd5e1; max-width: 220px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;"
+               th:text="${activeUser?.designation}">Executive Member, IT & Council Affairs</div>
+        </div>
+
+        <span class="role-badge"
+              th:classappend="${activeUser?.role != null ? #strings.toLowerCase(activeUser.role.toString()) : ''}"
+              th:text="${activeUser?.role}"
+              id="current-user-role" style="font-weight: 800; font-size: 0.75rem; letter-spacing: 0.5px; padding: 4px 10px; border-radius: 6px;">ADMIN</span>
+
+        <a href="/logout" class="btn btn-secondary btn-sm" style="font-size: 0.78rem; padding: 5px 10px; background: rgba(255,255,255,0.15); color: #fff; border: 1px solid rgba(255,255,255,0.25); border-radius: 6px; text-decoration: none;" title="End Active Session">🚪 Logout</a>
+      </div>
+
+      <div th:if="${activeUser == null}" class="session-panel" style="display: flex; align-items: center; gap: 12px;">
+        <div style="text-align: right;">
+          <div style="font-size: 0.72rem; color: #fde68a; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px;">Public View Mode</div>
+          <div style="font-size: 0.8rem; color: #cbd5e1;">Read-Only Council Registry</div>
+        </div>
+        <a href="/login" class="btn btn-gold" style="font-size: 0.84rem; padding: 7px 14px; text-decoration: none; font-weight: 700; display: inline-flex; align-items: center; gap: 6px;">🔐 Officer Login</a>
+      </div>
+  </header>
+
+  <nav class="nav-tab-bar">
+    <div class="nav-container">
+      <div class="tab-group">
+        <a href="/" class="nav-btn">🏛️ Meeting Dashboard</a>
+        <a href="/staff/dashboard" class="nav-btn">📋 Staff Dashboard</a>
+        <a href="/departments" class="nav-btn">🏢 Departments</a>
+        <a href="/rooms" class="nav-btn">🏛️ Meeting Rooms</a>
+        <a href="/users" class="nav-btn active">👥 Users</a>
+        <a href="/admin/dashboard" class="nav-btn" sec:authorize="hasRole('ADMIN')">⚙️ Admin Console</a>
+      </div>
+      <div class="quick-action-group" style="display: flex; gap: 8px; align-items: center;">
+        <a href="/meetings/new" class="btn btn-primary">➕ Schedule Meeting</a>
+      </div>
+    </div>
+  </nav>
+
+  <main class="app-main">
+    <div class="page-title-row">
+      <div>
+        <h2>👥 Council Users & Officers (Read-Only Directory)</h2>
+        <p>Comprehensive roster of Council Chairpersons, Staff Coordinators, and Administrative Executives.</p>
+      </div>
+    </div>
+
+    <!-- Search & Filter Bar -->
+    <div style="background: white; border: 1px solid #e2e8f0; border-radius: 10px; padding: 14px 20px; margin-bottom: 20px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 12px;">
+      <div style="display: flex; align-items: center; gap: 10px; flex: 1; max-width: 450px;">
+        <span style="color: #64748b;">🔍</span>
+        <input type="text" id="user-search-input" onkeyup="filterUserCards()" placeholder="Search officer by name, designation, or email..." class="form-control" style="padding: 8px 12px; font-size: 0.9rem; width: 100%;">
+      </div>
+      <div style="display: flex; gap: 10px; align-items: center;">
+        <select id="user-role-filter" onchange="filterUserCards()" class="form-control" style="font-size: 0.85rem; padding: 6px 12px; width: auto;">
+          <option value="ALL">All Roles</option>
+          <option value="ADMIN">ADMIN</option>
+          <option value="CHAIRPERSON">CHAIRPERSON</option>
+          <option value="STAFF">STAFF</option>
+        </select>
+        <div style="font-size: 0.85rem; color: #64748b;">
+          <span>🔒 Read-Only Directory</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- User Cards Grid -->
+    <div id="user-grid" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(340px, 1fr)); gap: 20px;">
+      <div th:each="u : ${users}" class="council-card user-card-item" th:attr="data-role=${u.role}, data-search=${#strings.toLowerCase(u.fullName + ' ' + u.username + ' ' + (u.designation != null ? u.designation : '') + ' ' + u.email)}" style="display: flex; flex-direction: column; justify-content: space-between;">
+        <div>
+          <div class="card-header" style="justify-content: space-between; align-items: flex-start;">
+            <div>
+              <div style="font-size: 0.75rem; color: #64748b; font-weight: 700; text-transform: uppercase;" th:text="${'@' + u.username}">@admin</div>
+              <h3 style="font-size: 1.1rem; color: #0f172a; margin: 2px 0 0 0;" th:text="${u.fullName}">Longki Rongpi</h3>
+            </div>
+            <span class="role-badge" th:classappend="${#strings.toLowerCase(u.role)}" th:text="${u.role}">ADMIN</span>
+          </div>
+          <div class="card-body" style="padding: 16px;">
+            <div style="font-weight: 700; color: #1e293b; font-size: 0.9rem; margin-bottom: 6px;" th:text="${'💼 ' + (u.designation != null ? u.designation : 'Council Officer')}">💼 Secretary to Karbi Anglong Autonomous Council</div>
+            <div style="font-size: 0.85rem; color: #0369a1; margin-bottom: 12px;" th:text="${u.department != null ? '🏢 ' + u.department.name : '🏢 General Council Secretariat'}">🏢 General Council Secretariat</div>
+            <div style="background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 8px; padding: 10px 12px; font-size: 0.82rem; color: #475569; display: flex; flex-direction: column; gap: 4px;">
+              <span th:text="${'✉️ ' + u.email}">✉️ admin.council@kaac.gov.in</span>
+              <span th:text="${'📞 ' + (u.phone != null ? u.phone : '+91 9435011001')}">📞 +91 9435011001</span>
+            </div>
+          </div>
+        </div>
+        <div style="background: #f1f5f9; padding: 10px 16px; border-top: 1px solid #e2e8f0; display: flex; justify-content: space-between; align-items: center; font-size: 0.8rem; color: #64748b;">
+          <span>Status: <strong style="color: #059669;" th:text="${u.status}">ACTIVE</strong></span>
+          <span th:text="${'ID: #' + u.id}">ID: #1</span>
+        </div>
+      </div>
+      <!-- Populated via Server -->
+    </div>
+  </main>
+
+  <script>
+    function filterUserCards() {
+      const query = (document.getElementById('user-search-input').value || '').toLowerCase().trim();
+      const roleFilter = document.getElementById('user-role-filter').value;
+      const cards = document.querySelectorAll('.user-card-item');
+      cards.forEach(card => {
+        const text = card.getAttribute('data-search') || '';
+        const role = card.getAttribute('data-role') || '';
+        const matchesQuery = text.includes(query);
+        const matchesRole = roleFilter === 'ALL' || role === roleFilter;
+        if (matchesQuery && matchesRole) {
+          card.style.display = 'flex';
+        } else {
+          card.style.display = 'none';
+        }
+      });
+    }
+  </script>
+</body>
+</html>

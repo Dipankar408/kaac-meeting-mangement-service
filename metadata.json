@@ -1,0 +1,6 @@
+{
+  "name": "KAAC Meeting Management System",
+  "description": "Spring MVC & H2 Database Meeting Management System for Karbi Anglong Autonomous Council with Role-Based Access (Admin, Staff, Chairperson), Room Allocation, and Conflict Detection.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}

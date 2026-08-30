@@ -1,0 +1,532 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8">
+  <title>Admin Console | KAAC Meeting Management</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" th:href="@{/public/css/style.css}" href="/public/css/style.css">
+</head>
+<body>
+  <header class="gov-topbar">
+    <div class="flag-tag">
+      <span>🏛️</span>
+      <span>SIXTH SCHEDULE AUTONOMOUS COUNCIL</span>
+    </div>
+    <div style="display: flex; gap: 16px; align-items: center;">
+      <span>📍 Diphu, Karbi Anglong, Assam</span>
+    </div>
+  </header>
+
+  <header class="main-header">
+    <div class="header-container">
+      <div class="brand-section">
+        <a href="/" style="text-decoration: none; color: inherit; display: flex; align-items: center; gap: 16px;">
+          <div class="council-crest">🏛️</div>
+          <div class="brand-titles">
+            <h1>KARBI ANGLONG AUTONOMOUS COUNCIL</h1>
+            <div class="sub-title">COUNCIL SECRETARIAT • MEETING MANAGEMENT SYSTEM</div>
+          </div>
+        </a>
+      </div>
+      <!-- Dynamic Session Panel for Authenticated Officer vs Public View Mode -->
+      <div th:if="${activeUser != null}" class="session-panel" style="display: flex; align-items: center; gap: 14px;">
+        <div class="current-user-info" style="text-align: right;">
+          <div style="font-size: 0.72rem; color: #a7f3d0; text-transform: uppercase; font-weight: 700; letter-spacing: 0.5px;">Active User</div>
+
+          <div class="user-name" id="current-user-name" style="font-weight: 700; font-size: 0.95rem; color: #ffffff;"
+               th:text="${activeUser?.fullName}">Longki Rongpi</div>
+
+          <div id="current-user-designation" style="font-size: 0.75rem; color: #cbd5e1; max-width: 220px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;"
+               th:text="${activeUser?.designation}">Executive Member, IT & Council Affairs</div>
+        </div>
+
+        <span class="role-badge"
+              th:classappend="${activeUser?.role != null ? #strings.toLowerCase(activeUser.role.toString()) : ''}"
+              th:text="${activeUser?.role}"
+              id="current-user-role" style="font-weight: 800; font-size: 0.75rem; letter-spacing: 0.5px; padding: 4px 10px; border-radius: 6px;">ADMIN</span>
+
+        <a href="/logout" class="btn btn-secondary btn-sm" style="font-size: 0.78rem; padding: 5px 10px; background: rgba(255,255,255,0.15); color: #fff; border: 1px solid rgba(255,255,255,0.25); border-radius: 6px; text-decoration: none;" title="End Active Session">🚪 Logout</a>
+      </div>
+
+      <div th:if="${activeUser == null}" class="session-panel" style="display: flex; align-items: center; gap: 12px;">
+        <div style="text-align: right;">
+          <div style="font-size: 0.72rem; color: #fde68a; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px;">Public View Mode</div>
+          <div style="font-size: 0.8rem; color: #cbd5e1;">Read-Only Council Registry</div>
+        </div>
+        <a href="/login" class="btn btn-gold" style="font-size: 0.84rem; padding: 7px 14px; text-decoration: none; font-weight: 700; display: inline-flex; align-items: center; gap: 6px;">🔐 Officer Login</a>
+      </div>
+  </header>
+
+  <!-- Complete Navigation Bar with all menus -->
+  <nav class="nav-tab-bar">
+    <div class="nav-container">
+      <div class="tab-group">
+        <a href="/" class="nav-btn">🏛️ Meeting Dashboard</a>
+        <a href="/staff/dashboard" class="nav-btn">📋 Staff Dashboard</a>
+        <a href="/departments" class="nav-btn">🏢 Departments</a>
+        <a href="/rooms" class="nav-btn">🏛️ Meeting Rooms</a>
+        <a href="/users" class="nav-btn">👥 Users</a>
+        <a href="/admin/dashboard" class="nav-btn active">⚙️ Admin Console</a>
+      </div>
+      <div class="quick-action-group" style="display: flex; gap: 8px; align-items: center;">
+        <a href="/meetings/new" class="btn btn-primary">➕ Schedule Meeting</a>
+      </div>
+    </div>
+  </nav>
+
+  <main class="app-main">
+    <div class="page-title-row">
+      <div>
+        <h2>⚙️ Council Secretariat Master Data Management</h2>
+        <p>Full Master CRUD Authority over Departments, Council Users (RBAC), and Secretariat Conference Halls.</p>
+      </div>
+    </div>
+
+    <!-- Top Metrics Overview -->
+    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 16px; margin-bottom: 24px;">
+      <div class="stat-card" style="background: white; border: 1px solid #e2e8f0; border-radius: 10px; padding: 16px 20px; display: flex; align-items: center; gap: 16px;">
+        <div style="font-size: 2rem;">🏢</div>
+        <div>
+          <div style="font-size: 0.8rem; color: #64748b; font-weight: 700; text-transform: uppercase;">Departments</div>
+          <div id="stat-depts" style="font-size: 1.5rem; font-weight: 800; color: #0f172a;" th:text="${totalDepartments != null ? totalDepartments : departments.size()}">6</div>
+        </div>
+      </div>
+      <div class="stat-card" style="background: white; border: 1px solid #e2e8f0; border-radius: 10px; padding: 16px 20px; display: flex; align-items: center; gap: 16px;">
+        <div style="font-size: 2rem;">👥</div>
+        <div>
+          <div style="font-size: 0.8rem; color: #64748b; font-weight: 700; text-transform: uppercase;">Council Users</div>
+          <div id="stat-users" style="font-size: 1.5rem; font-weight: 800; color: #0f172a;" th:text="${totalUsers != null ? totalUsers : users.size()}">7</div>
+        </div>
+      </div>
+      <div class="stat-card" style="background: white; border: 1px solid #e2e8f0; border-radius: 10px; padding: 16px 20px; display: flex; align-items: center; gap: 16px;">
+        <div style="font-size: 2rem;">🏛️</div>
+        <div>
+          <div style="font-size: 0.8rem; color: #64748b; font-weight: 700; text-transform: uppercase;">Meeting Venues</div>
+          <div id="stat-rooms" style="font-size: 1.5rem; font-weight: 800; color: #0f172a;" th:text="${totalRooms != null ? totalRooms : rooms.size()}">4</div>
+        </div>
+      </div>
+      <div class="stat-card" style="background: white; border: 1px solid #e2e8f0; border-radius: 10px; padding: 16px 20px; display: flex; align-items: center; gap: 16px;">
+        <div style="font-size: 2rem;">📅</div>
+        <div>
+          <div style="font-size: 0.8rem; color: #64748b; font-weight: 700; text-transform: uppercase;">Meeting Sessions</div>
+          <div id="stat-meetings" style="font-size: 1.5rem; font-weight: 800; color: #0f172a;" th:text="${totalMeetings != null ? totalMeetings : schedules.size()}">5</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Quick Navigation Tabs for Admin Sections -->
+    <div style="display: flex; gap: 10px; margin-bottom: 20px; border-bottom: 2px solid #e2e8f0; padding-bottom: 8px;">
+      <a href="#section-depts" class="btn btn-secondary btn-sm" style="text-decoration: none;">🏢 Departments</a>
+      <a href="#section-users" class="btn btn-secondary btn-sm" style="text-decoration: none;">👥 Council Users</a>
+      <a href="#section-rooms" class="btn btn-secondary btn-sm" style="text-decoration: none;">🏛️ Meeting Rooms</a>
+    </div>
+
+    <!-- Departments Management -->
+    <div class="council-card" id="section-depts" style="margin-bottom: 24px;">
+      <div class="card-header" style="display: flex; justify-content: space-between; align-items: center;">
+        <h3><span>🏢</span> KAAC Administrative Departments</h3>
+        <button onclick="document.getElementById('add-dept-form').style.display = document.getElementById('add-dept-form').style.display === 'none' ? 'block' : 'none';" class="btn btn-primary btn-sm">➕ Add Department</button>
+      </div>
+
+      <!-- Add Department Form -->
+      <div id="add-dept-form" style="display: none; background: #f8fafc; border-bottom: 1px solid #e2e8f0; padding: 16px 20px;">
+        <h4 style="margin: 0 0 12px 0; color: #0f172a; font-size: 0.95rem;">Register New Council Department</h4>
+        <form method="POST" action="/admin/departments/save" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 12px; align-items: flex-end;">
+          <div>
+            <label style="font-size: 0.78rem; font-weight: 700; color: #475569; display: block; margin-bottom: 4px;">Department Code (e.g. EDN)</label>
+            <input type="text" name="code" required placeholder="EDN" class="form-control" style="font-size: 0.85rem; padding: 6px 10px;">
+          </div>
+          <div>
+            <label style="font-size: 0.78rem; font-weight: 700; color: #475569; display: block; margin-bottom: 4px;">Department Name</label>
+            <input type="text" name="name" required placeholder="Education & Literacy Department" class="form-control" style="font-size: 0.85rem; padding: 6px 10px;">
+          </div>
+          <div>
+            <label style="font-size: 0.78rem; font-weight: 700; color: #475569; display: block; margin-bottom: 4px;">Head of Department (HOD)</label>
+            <input type="text" name="hodName" placeholder="Dr. Junmoni Teron" class="form-control" style="font-size: 0.85rem; padding: 6px 10px;">
+          </div>
+          <div>
+            <label style="font-size: 0.78rem; font-weight: 700; color: #475569; display: block; margin-bottom: 4px;">Contact Email</label>
+            <input type="email" name="contactEmail" placeholder="dept.kaac@assam.gov.in" class="form-control" style="font-size: 0.85rem; padding: 6px 10px;">
+          </div>
+          <div>
+            <label style="font-size: 0.78rem; font-weight: 700; color: #475569; display: block; margin-bottom: 4px;">Phone</label>
+            <input type="text" name="phone" placeholder="+91 3671 272200" class="form-control" style="font-size: 0.85rem; padding: 6px 10px;">
+          </div>
+          <div>
+            <button type="submit" class="btn btn-primary btn-sm" style="width: 100%; padding: 8px;">💾 Save Department</button>
+          </div>
+        </form>
+      </div>
+
+      <div class="table-responsive">
+        <table class="council-table">
+          <thead>
+            <tr>
+              <th>ID</th>
+              <th>Code</th>
+              <th>Department Name</th>
+              <th>Head of Department (HOD)</th>
+              <th>Contact Email</th>
+              <th>Phone</th>
+              <th style="text-align: right;">Actions</th>
+            </tr>
+          </thead>
+          <tbody id="admin-dept-tbody">
+          <th:block th:each="d : ${departments}">
+            <!-- 1. DISPLAY ROW -->
+            <tr>
+              <td><strong th:text="${d.id}">1</strong></td>
+              <td><span style="background: #e0f2fe; color: #0369a1; padding: 2px 6px; border-radius: 4px; font-weight: 700; font-size: 0.8rem;" th:text="${d.code}">GAD</span></td>
+              <td><strong th:text="${d.name}">General Administration Department</strong></td>
+              <td th:text="${d.hodName}">Mukesh Chandra Sahu, IAS</td>
+              <td th:text="${d.contactEmail}">gad.kaac@assam.gov.in</td>
+              <td th:text="${d.phone}">+91 3671 272221</td>
+              <td style="text-align: right; white-space: nowrap;">
+                <!-- Edit Button -->
+                <a href="javascript:void(0);"
+                   th:onclick="'document.getElementById(\'edit-dept-form-' + ${d.id} + '\').style.display = \'table-row\';'"
+                   class="btn btn-outline btn-sm"
+                   th:if="${activeUser != null and (activeUser.role.toString() == 'ADMIN')}">Edit</a>
+
+                <form th:action="@{'/admin/departments/delete/' + ${d.id}}" method="post" onsubmit="return confirm('Are you sure you want to delete this department?');" style="display: inline;">
+                  <button type="submit" class="btn btn-danger btn-sm" style="font-size: 0.75rem; padding: 3px 8px;">🗑️ Delete</button>
+                </form>
+              </td>
+            </tr>
+
+            <!-- 2. HIDDEN EDIT FORM ROW -->
+            <tr th:id="'edit-dept-form-' + ${d.id}" style="display: none;">
+              <!-- colspan="7" for Departments table -->
+              <td colspan="7" style="padding: 0; border: none;">
+                <div style="background: #f8fafc; border-bottom: 2px solid #cbd5e1; padding: 16px 20px;">
+                  <h4 style="margin: 0 0 12px 0; color: #0f172a; font-size: 0.95rem;">Edit Council Department</h4>
+
+                  <form th:action="@{'/admin/departments/update/' + ${d.id}}" method="POST" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 12px; align-items: flex-end;">
+                    <input type="hidden" name="id" th:value="${d.id}">
+
+                    <div>
+                      <label style="font-size: 0.78rem; font-weight: 700; color: #475569; display: block; margin-bottom: 4px;">Department Code (e.g. EDN)</label>
+                      <input type="text" name="code" required class="form-control" style="font-size: 0.85rem; padding: 6px 10px;" th:value="${d.code}">
+                    </div>
+                    <div>
+                      <label style="font-size: 0.78rem; font-weight: 700; color: #475569; display: block; margin-bottom: 4px;">Department Name</label>
+                      <input type="text" name="name" required class="form-control" style="font-size: 0.85rem; padding: 6px 10px;" th:value="${d.name}">
+                    </div>
+                    <div>
+                      <label style="font-size: 0.78rem; font-weight: 700; color: #475569; display: block; margin-bottom: 4px;">Head of Department (HOD)</label>
+                      <input type="text" name="hodName" class="form-control" style="font-size: 0.85rem; padding: 6px 10px;" th:value="${d.hodName}">
+                    </div>
+                    <div>
+                      <label style="font-size: 0.78rem; font-weight: 700; color: #475569; display: block; margin-bottom: 4px;">Contact Email</label>
+                      <input type="email" name="contactEmail" class="form-control" style="font-size: 0.85rem; padding: 6px 10px;" th:value="${d.contactEmail}">
+                    </div>
+                    <div>
+                      <label style="font-size: 0.78rem; font-weight: 700; color: #475569; display: block; margin-bottom: 4px;">Phone</label>
+                      <input type="text" name="phone" class="form-control" style="font-size: 0.85rem; padding: 6px 10px;" th:value="${d.phone}">
+                    </div>
+
+                    <div style="display: flex; gap: 8px;">
+                      <button type="button" class="btn btn-secondary btn-sm" style="padding: 8px;" th:onclick="'document.getElementById(\'edit-dept-form-' + ${d.id} + '\').style.display = \'none\';'">Cancel</button>
+                      <button type="submit" class="btn btn-primary btn-sm" style="flex: 1; padding: 8px; background: #064e3b; border-color: #064e3b;">🔄 Update</button>
+                    </div>
+                  </form>
+                </div>
+              </td>
+            </tr>
+          </th:block>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- Users Management -->
+    <div class="council-card" id="section-users" style="margin-bottom: 24px;">
+      <div class="card-header" style="display: flex; justify-content: space-between; align-items: center;">
+        <h3><span>👥</span> Council Users & Role-Based Access Control (RBAC)</h3>
+        <button onclick="document.getElementById('add-user-form').style.display = document.getElementById('add-user-form').style.display === 'none' ? 'block' : 'none';" class="btn btn-primary btn-sm">➕ Add User</button>
+      </div>
+
+      <!-- Add User Form -->
+      <div id="add-user-form" style="display: none; background: #f8fafc; border-bottom: 1px solid #e2e8f0; padding: 16px 20px;">
+        <h4 style="margin: 0 0 12px 0; color: #0f172a; font-size: 0.95rem;">Register New Council User Account</h4>
+        <form method="POST" action="/admin/users/save" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 12px; align-items: flex-end;">
+          <div>
+            <label style="font-size: 0.78rem; font-weight: 700; color: #475569; display: block; margin-bottom: 4px;">Username</label>
+            <input type="text" name="username" required placeholder="staff_new" class="form-control" style="font-size: 0.85rem; padding: 6px 10px;">
+          </div>
+          <div>
+            <label style="font-size: 0.78rem; font-weight: 700; color: #475569; display: block; margin-bottom: 4px;">Full Name</label>
+            <input type="text" name="fullName" required placeholder="Officer Name" class="form-control" style="font-size: 0.85rem; padding: 6px 10px;">
+          </div>
+          <div>
+            <label style="font-size: 0.78rem; font-weight: 700; color: #475569; display: block; margin-bottom: 4px;">Password</label>
+            <input type="password" name="password" required placeholder="password123" class="form-control" style="font-size: 0.85rem; padding: 6px 10px;">
+          </div>
+          <div>
+            <label style="font-size: 0.78rem; font-weight: 700; color: #475569; display: block; margin-bottom: 4px;">Role</label>
+            <select name="role" class="form-control" style="font-size: 0.85rem; padding: 6px 10px;">
+              <option value="STAFF">STAFF (Protocol / Coordinator)</option>
+              <option value="CHAIRPERSON">CHAIRPERSON (CEM / EM)</option>
+              <option value="ADMIN">ADMIN (Council Secretary)</option>
+            </select>
+          </div>
+          <div>
+            <label style="font-size: 0.78rem; font-weight: 700; color: #475569; display: block; margin-bottom: 4px;">Designation</label>
+            <input type="text" name="designation" placeholder="Assistant Protocol Officer" class="form-control" style="font-size: 0.85rem; padding: 6px 10px;">
+          </div>
+          <div>
+            <label style="font-size: 0.78rem; font-weight: 700; color: #475569; display: block; margin-bottom: 4px;">Email</label>
+            <input type="email" name="email" required placeholder="officer@kaac.gov.in" class="form-control" style="font-size: 0.85rem; padding: 6px 10px;">
+          </div>
+          <div>
+            <label style="font-size: 0.78rem; font-weight: 700; color: #475569; display: block; margin-bottom: 4px;">Department</label>
+            <select name="departmentId" class="form-control" style="font-size: 0.85rem; padding: 6px 10px;" id="user-dept-select">
+              <option value="1">General Administration Department (GAD)</option>
+              <!-- Dept Select Options -->
+            </select>
+          </div>
+          <div>
+            <button type="submit" class="btn btn-primary btn-sm" style="width: 100%; padding: 8px;">💾 Save User</button>
+          </div>
+        </form>
+      </div>
+
+      <div class="table-responsive">
+        <table class="council-table">
+          <thead>
+            <tr>
+              <th>ID</th>
+              <th>Username</th>
+              <th>Full Name</th>
+              <th>Role</th>
+              <th>Designation</th>
+              <th>Email</th>
+              <th>Status</th>
+              <th style="text-align: right;">Actions</th>
+            </tr>
+          </thead>
+          <tbody id="admin-user-tbody">
+          <th:block th:each="u : ${users}">
+            <!-- 1. DISPLAY ROW -->
+            <tr>
+              <td><strong th:text="${u.id}">1</strong></td>
+              <td><code th:text="${u.username}">admin</code></td>
+              <td><strong th:text="${u.fullName}">Longki Rongpi</strong></td>
+              <td><span class="role-badge" th:classappend="${u.role != null ? #strings.toLowerCase(u.role.toString()) : ''}" th:text="${u.role}">ADMIN</span></td>
+              <td th:text="${u.designation}">Secretary to Council</td>
+              <td th:text="${u.email}">admin.council@kaac.gov.in</td>
+              <td><strong th:style="${u.status != null and u.status.toString() == 'ACTIVE' ? 'color: #059669;' : 'color: #dc2626;'}" th:text="${u.status}">ACTIVE</strong></td>
+              <td style="text-align: right; white-space: nowrap;">
+                <!-- Edit Button -->
+                <a href="javascript:void(0);"
+                   th:onclick="'document.getElementById(\'edit-user-form-' + ${u.id} + '\').style.display = \'table-row\';'"
+                   class="btn btn-outline btn-sm"
+                   th:if="${activeUser != null and (activeUser.role.toString() == 'ADMIN')}">Edit</a>
+
+                <form th:action="@{'/admin/users/delete/' + ${u.id}}" method="post" onsubmit="return confirm('Are you sure you want to delete this user?');" style="display: inline;">
+                  <button type="submit" class="btn btn-danger btn-sm" style="font-size: 0.75rem; padding: 3px 8px;">🗑️ Delete</button>
+                </form>
+              </td>
+            </tr>
+
+            <!-- 2. HIDDEN EDIT FORM ROW -->
+            <tr th:id="'edit-user-form-' + ${u.id}" style="display: none;">
+              <!-- colspan="8" for Users table -->
+              <td colspan="8" style="padding: 0; border: none;">
+                <div style="background: #f8fafc; border-bottom: 2px solid #cbd5e1; padding: 16px 20px;">
+                  <h4 style="margin: 0 0 12px 0; color: #0f172a; font-size: 0.95rem;">Edit Council User Account</h4>
+
+                  <form th:action="@{'/admin/users/update/' + ${u.id}}" method="POST" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 12px; align-items: flex-end;">
+                    <input type="hidden" name="id" th:value="${u.id}">
+
+                    <div>
+                      <label style="font-size: 0.78rem; font-weight: 700; color: #475569; display: block; margin-bottom: 4px;">Username</label>
+                      <input type="text" name="username" required class="form-control" style="font-size: 0.85rem; padding: 6px 10px;" th:value="${u.username}">
+                    </div>
+                    <div>
+                      <label style="font-size: 0.78rem; font-weight: 700; color: #475569; display: block; margin-bottom: 4px;">Full Name</label>
+                      <input type="text" name="fullName" required class="form-control" style="font-size: 0.85rem; padding: 6px 10px;" th:value="${u.fullName}">
+                    </div>
+                    <div>
+                      <label style="font-size: 0.78rem; font-weight: 700; color: #475569; display: block; margin-bottom: 4px;">Password (Leave blank to keep current)</label>
+                      <input type="password" name="password" class="form-control" style="font-size: 0.85rem; padding: 6px 10px;" th:value="${u.password}">
+                    </div>
+                    <div>
+                      <label style="font-size: 0.78rem; font-weight: 700; color: #475569; display: block; margin-bottom: 4px;">Role</label>
+                      <select name="role" class="form-control" style="font-size: 0.85rem; padding: 6px 10px;">
+                        <option value="STAFF" th:selected="${u.role != null and u.role.toString() == 'STAFF'}">STAFF (Protocol / Coordinator)</option>
+                        <option value="CHAIRPERSON" th:selected="${u.role != null and u.role.toString() == 'CHAIRPERSON'}">CHAIRPERSON (CEM / EM)</option>
+                        <option value="ADMIN" th:selected="${u.role != null and u.role.toString() == 'ADMIN'}">ADMIN (Council Secretary)</option>
+                      </select>
+                    </div>
+                    <div>
+                      <label style="font-size: 0.78rem; font-weight: 700; color: #475569; display: block; margin-bottom: 4px;">Designation</label>
+                      <input type="text" name="designation" class="form-control" style="font-size: 0.85rem; padding: 6px 10px;" th:value="${u.designation}">
+                    </div>
+                    <div>
+                      <label style="font-size: 0.78rem; font-weight: 700; color: #475569; display: block; margin-bottom: 4px;">Email</label>
+                      <input type="email" name="email" required class="form-control" style="font-size: 0.85rem; padding: 6px 10px;" th:value="${u.email}">
+                    </div>
+                    <div>
+                      <label style="font-size: 0.78rem; font-weight: 700; color: #475569; display: block; margin-bottom: 4px;">Department</label>
+                      <select name="departmentId" class="form-control" style="font-size: 0.85rem; padding: 6px 10px;">
+                        <option value="">No Department</option>
+                        <!-- Dynamic Department List for Users -->
+                        <option th:each="dept : ${departments}"
+                                th:value="${dept.id}"
+                                th:text="${dept.name}"
+                                th:selected="${u.department != null and u.department.id == dept.id}"></option>
+                      </select>
+                    </div>
+                    <div>
+                      <label style="font-size: 0.78rem; font-weight: 700; color: #475569; display: block; margin-bottom: 4px;">Status</label>
+                      <select name="status" class="form-control" style="font-size: 0.85rem; padding: 6px 10px;">
+                        <option value="ACTIVE" th:selected="${u.status != null and u.status.toString() == 'ACTIVE'}">ACTIVE</option>
+                        <option value="INACTIVE" th:selected="${u.status != null and u.status.toString() == 'INACTIVE'}">INACTIVE</option>
+                      </select>
+                    </div>
+
+                    <div style="display: flex; gap: 8px;">
+                      <button type="button" class="btn btn-secondary btn-sm" style="padding: 8px;" th:onclick="'document.getElementById(\'edit-user-form-' + ${u.id} + '\').style.display = \'none\';'">Cancel</button>
+                      <button type="submit" class="btn btn-primary btn-sm" style="flex: 1; padding: 8px; background: #064e3b; border-color: #064e3b;">🔄 Update</button>
+                    </div>
+                  </form>
+                </div>
+              </td>
+            </tr>
+          </th:block>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- Meeting Rooms Management -->
+    <!-- Meeting Rooms Management -->
+    <div class="council-card" id="section-rooms" style="margin-bottom: 24px;">
+      <div class="card-header" style="display: flex; justify-content: space-between; align-items: center;">
+        <h3><span>🏛️</span> Secretariat Conference Halls & Meeting Rooms</h3>
+        <button onclick="document.getElementById('add-room-form').style.display = document.getElementById('add-room-form').style.display === 'none' ? 'block' : 'none';" class="btn btn-primary btn-sm">➕ Add Venue</button>
+      </div>
+
+      <!-- Add Room Form -->
+      <div id="add-room-form" style="display: none; background: #f8fafc; border-bottom: 1px solid #e2e8f0; padding: 16px 20px;">
+        <h4 style="margin: 0 0 12px 0; color: #0f172a; font-size: 0.95rem;">Register New Conference Hall / Meeting Room</h4>
+        <form method="POST" action="/admin/rooms/save" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 12px; align-items: flex-end;">
+          <div>
+            <label style="font-size: 0.78rem; font-weight: 700; color: #475569; display: block; margin-bottom: 4px;">Room Number / Code</label>
+            <input type="text" name="roomNumber" required placeholder="KAAC-CR3" class="form-control" style="font-size: 0.85rem; padding: 6px 10px;">
+          </div>
+          <div>
+            <label style="font-size: 0.78rem; font-weight: 700; color: #475569; display: block; margin-bottom: 4px;">Room Name</label>
+            <input type="text" name="name" required placeholder="Health Committee Meeting Room" class="form-control" style="font-size: 0.85rem; padding: 6px 10px;">
+          </div>
+          <div>
+            <label style="font-size: 0.78rem; font-weight: 700; color: #475569; display: block; margin-bottom: 4px;">Location</label>
+            <input type="text" name="location" required placeholder="Health Wing, 1st Floor, Diphu" class="form-control" style="font-size: 0.85rem; padding: 6px 10px;">
+          </div>
+          <div>
+            <label style="font-size: 0.78rem; font-weight: 700; color: #475569; display: block; margin-bottom: 4px;">Capacity (Seats)</label>
+            <input type="number" name="capacity" required placeholder="30" class="form-control" style="font-size: 0.85rem; padding: 6px 10px;">
+          </div>
+          <div>
+            <label style="font-size: 0.78rem; font-weight: 700; color: #475569; display: block; margin-bottom: 4px;">Facilities</label>
+            <input type="text" name="facilities" placeholder="Projector, Video Con, AC" class="form-control" style="font-size: 0.85rem; padding: 6px 10px;">
+          </div>
+          <div>
+            <button type="submit" class="btn btn-primary btn-sm" style="width: 100%; padding: 8px;">💾 Save Venue</button>
+          </div>
+        </form>
+      </div>
+
+      <div class="table-responsive">
+        <table class="council-table">
+          <thead>
+          <tr>
+            <th>ID</th>
+            <th>Room No</th>
+            <th>Room Name</th>
+            <th>Location</th>
+            <th>Capacity</th>
+            <th>Facilities</th>
+            <th>Status</th>
+            <th style="text-align: right;">Actions</th>
+          </tr>
+          </thead>
+          <tbody id="admin-room-tbody">
+          <!-- Use th:block so we can output TWO table rows per room (Display Row + Edit Form Row) -->
+          <th:block th:each="r : ${rooms}">
+
+            <!-- 1. DISPLAY ROW -->
+            <tr>
+              <td><strong th:text="${r.id}">1</strong></td>
+              <td><span style="background: #fef3c7; color: #92400e; padding: 2px 6px; border-radius: 4px; font-weight: 700; font-size: 0.8rem;" th:text="${r.roomNumber}">KAAC-H1</span></td>
+              <td><strong th:text="${r.name}">Council Central Session Hall</strong></td>
+              <td th:text="${r.location}">Main Secretariat Complex</td>
+              <td th:text="${'👥 ' + r.capacity + ' seats'}">👥 120 seats</td>
+              <td th:text="${r.facilities}">4K Projector, Mics, AC</td>
+              <td><span class="status-badge available" th:text="${r.status != null ? r.status : 'AVAILABLE'}">AVAILABLE</span></td>
+              <td style="text-align: right; white-space: nowrap;">
+                <!-- Note the display: 'table-row' instead of 'block' to prevent table breaking -->
+                <a href="javascript:void(0);"
+                   th:onclick="'document.getElementById(\'edit-room-form-' + ${r.id} + '\').style.display = \'table-row\';'"
+                   class="btn btn-outline btn-sm"
+                   th:if="${activeUser != null and (activeUser.role.toString() == 'ADMIN')}">Edit</a>
+
+                <form th:action="@{'/admin/rooms/delete/' + ${r.id}}" method="post" onsubmit="return confirm('Are you sure you want to delete this venue?');" style="display: inline;">
+                  <button type="submit" class="btn btn-danger btn-sm" style="font-size: 0.75rem; padding: 3px 8px;">🗑️ Delete</button>
+                </form>
+              </td>
+            </tr>
+
+            <!-- 2. HIDDEN EDIT FORM ROW -->
+            <tr th:id="'edit-room-form-' + ${r.id}" style="display: none;">
+              <!-- colspan="8" ensures the form stretches across the entire table width -->
+              <td colspan="8" style="padding: 0; border: none;">
+                <div style="background: #f8fafc; border-bottom: 2px solid #cbd5e1; padding: 16px 20px;">
+                  <h4 style="margin: 0 0 12px 0; color: #0f172a; font-size: 0.95rem;">Edit Conference Hall / Meeting Room</h4>
+
+                  <form th:action="@{'/admin/rooms/update/' + ${r.id}}" method="POST" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 12px; align-items: flex-end;">
+                    <input type="hidden" name="id" th:value="${r.id}">
+
+                    <div>
+                      <label style="font-size: 0.78rem; font-weight: 700; color: #475569; display: block; margin-bottom: 4px;">Room Number / Code</label>
+                      <input type="text" name="roomNumber" required class="form-control" style="font-size: 0.85rem; padding: 6px 10px;" th:value="${r.roomNumber}">
+                    </div>
+
+                    <div>
+                      <label style="font-size: 0.78rem; font-weight: 700; color: #475569; display: block; margin-bottom: 4px;">Room Name</label>
+                      <input type="text" name="name" required class="form-control" style="font-size: 0.85rem; padding: 6px 10px;" th:value="${r.name}">
+                    </div>
+
+                    <div>
+                      <label style="font-size: 0.78rem; font-weight: 700; color: #475569; display: block; margin-bottom: 4px;">Location</label>
+                      <input type="text" name="location" required class="form-control" style="font-size: 0.85rem; padding: 6px 10px;" th:value="${r.location}">
+                    </div>
+
+                    <div>
+                      <label style="font-size: 0.78rem; font-weight: 700; color: #475569; display: block; margin-bottom: 4px;">Capacity (Seats)</label>
+                      <input type="number" name="capacity" required class="form-control" style="font-size: 0.85rem; padding: 6px 10px;" th:value="${r.capacity}">
+                    </div>
+
+                    <div>
+                      <label style="font-size: 0.78rem; font-weight: 700; color: #475569; display: block; margin-bottom: 4px;">Facilities</label>
+                      <input type="text" name="facilities" class="form-control" style="font-size: 0.85rem; padding: 6px 10px;" th:value="${r.facilities}">
+                    </div>
+
+                    <div style="display: flex; gap: 8px;">
+                      <button type="button" class="btn btn-secondary btn-sm" style="padding: 8px;" th:onclick="'document.getElementById(\'edit-room-form-' + ${r.id} + '\').style.display = \'none\';'">Cancel</button>
+                      <button type="submit" class="btn btn-primary btn-sm" style="flex: 1; padding: 8px; background: #064e3b; border-color: #064e3b;">🔄 Update</button>
+                    </div>
+                  </form>
+                </div>
+              </td>
+            </tr>
+
+          </th:block>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </main>
+</body>
+</html>

@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8">
+  <title>Official Council Meeting Notice | KAAC</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" th:href="@{/public/css/style.css}" href="/public/css/style.css">
+  <style>
+    @media print {
+      .no-print { display: none !important; }
+      body { background: white; margin: 0; padding: 0; }
+    }
+  </style>
+</head>
+<body style="background: #f1f5f9; padding: 24px;">
+  <div class="no-print" style="max-width: 800px; margin: 0 auto 16px; display: flex; justify-content: space-between; align-items: center;">
+    <a href="/" class="btn btn-secondary">← Back to Overview</a>
+    <button onclick="window.print()" class="btn btn-primary">🖨️ Print Notice</button>
+  </div>
+
+  <div class="meeting-notice-sheet" style="max-width: 800px; margin: 0 auto; background: white; padding: 40px; border-radius: 8px; border: 1px solid #cbd5e1; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1);">
+    <div class="notice-emblem-header" style="text-align: center; border-bottom: 2px solid #0f5132; padding-bottom: 16px; margin-bottom: 24px;">
+      <h2 style="font-size: 1.4rem; color: #0f5132; margin: 0;">KARBI ANGLONG AUTONOMOUS COUNCIL</h2>
+      <h3 style="font-size: 1.1rem; color: #1e3a8a; margin: 4px 0;">COUNCIL SECRETARIAT :: DIPHU, ASSAM</h3>
+      <p style="font-size: 0.85rem; color: #64748b; margin: 0;">(CONSTITUTED UNDER THE SIXTH SCHEDULE TO THE CONSTITUTION OF INDIA)</p>
+    </div>
+
+    <div style="display: flex; justify-content: space-between; font-size: 0.9rem; margin-bottom: 20px;">
+      <div><strong>No.</strong> <span th:text="${'KAAC/CONF/' + meeting.id + '/2026'}">KAAC/CONF/1/2026</span></div>
+      <div><strong>Dated Diphu, the:</strong> <span th:text="${#temporals.format(meeting.meetingDate, 'dd MMMM, yyyy')}">27 August, 2026</span></div>
+    </div>
+
+    <div style="text-align: center; font-size: 1.2rem; font-weight: 800; letter-spacing: 2px; text-decoration: underline; margin-bottom: 20px; color: #0f5132;">
+      MEETING NOTICE
+    </div>
+
+    <p style="font-size: 0.95rem; line-height: 1.6; margin-bottom: 20px;">
+      It is hereby notified for information of all concerned that a Council Administrative Review Meeting on
+      <strong th:text="${'&quot;' + meeting.title + '&quot;'}">"Meeting Title"</strong>
+      has been scheduled to be held as per the program outlined below:
+    </p>
+
+    <table class="council-table" style="margin-bottom: 24px; border: 1px solid #cbd5e1;">
+      <tr>
+        <td style="width: 28%; font-weight: bold; background: #f8fafc;">Subject / Title</td>
+        <td style="font-weight: bold;" th:text="${meeting.title}">Meeting Title</td>
+      </tr>
+      <tr>
+        <td style="font-weight: bold; background: #f8fafc;">Date of Meeting</td>
+        <td th:text="${meeting.meetingDate}">2026-09-02</td>
+      </tr>
+      <tr>
+        <td style="font-weight: bold; background: #f8fafc;">Time</td>
+        <td th:text="${meeting.startTime + ' to ' + meeting.endTime}">10:00 to 12:30</td>
+      </tr>
+      <tr>
+        <td style="font-weight: bold; background: #f8fafc;">Venue</td>
+        <td th:text="${meeting.meetingRoom.name + ' (' + meeting.meetingRoom.location + ')'}">Council Central Hall</td>
+      </tr>
+      <tr>
+        <td style="font-weight: bold; background: #f8fafc;">Designated Chairperson</td>
+        <td style="font-weight: bold; color: #b45309;" th:text="${meeting.chairperson.fullName + ' (' + meeting.chairperson.designation + ')'}">Hon. CEM</td>
+      </tr>
+      <tr>
+        <td style="font-weight: bold; background: #f8fafc;">Department</td>
+        <td th:text="${meeting.department.name}">General Administration</td>
+      </tr>
+      <tr>
+        <td style="font-weight: bold; background: #f8fafc;">Agenda Items</td>
+        <td style="white-space: pre-line;" th:text="${meeting.agenda}">1. Review...</td>
+      </tr>
+      <tr>
+        <td style="font-weight: bold; background: #f8fafc;">Invited Dignitaries</td>
+        <td th:text="${meeting.attendees}">Attendees</td>
+      </tr>
+    </table>
+
+    <p style="font-size: 0.95rem; line-height: 1.6; margin-bottom: 40px;">
+      All concerned Executive Members, Department Heads, and invited Officers are requested to make it convenient to attend the meeting positively along with updated status reports.
+    </p>
+
+    <div style="float: right; text-align: center;">
+      <div style="font-weight: bold;">Secretary</div>
+      <div>Karbi Anglong Autonomous Council, Diphu</div>
+    </div>
+    <div style="clear: both;"></div>
+  </div>
+</body>
+</html>

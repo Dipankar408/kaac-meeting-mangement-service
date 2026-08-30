@@ -1,0 +1,245 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.w3.org/1999/xhtml">
+<head>
+  <meta charset="UTF-8">
+  <title>Edit Council Meeting | KAAC Meeting Management</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" th:href="@{/public/css/style.css}" href="/public/css/style.css">
+</head>
+<body>
+<header class="gov-topbar">
+  <div class="flag-tag">
+    <span>🏛️</span>
+    <span>SIXTH SCHEDULE AUTONOMOUS COUNCIL</span>
+  </div>
+  <div style="display: flex; gap: 16px; align-items: center;">
+    <span>📍 Diphu, Karbi Anglong, Assam</span>
+  </div>
+</header>
+
+<header class="main-header">
+  <div class="header-container">
+    <div class="brand-section">
+      <a href="/" style="text-decoration: none; color: inherit; display: flex; align-items: center; gap: 16px;">
+        <div class="council-crest">🏛️</div>
+        <div class="brand-titles">
+          <h1>KARBI ANGLONG AUTONOMOUS COUNCIL</h1>
+          <div class="sub-title">COUNCIL SECRETARIAT • MEETING MANAGEMENT SYSTEM</div>
+        </div>
+      </a>
+    </div>
+    <!-- Dynamic Session Panel -->
+    <div th:if="${activeUser != null}" class="session-panel" style="display: flex; align-items: center; gap: 14px;">
+      <div class="current-user-info" style="text-align: right;">
+        <div style="font-size: 0.72rem; color: #a7f3d0; text-transform: uppercase; font-weight: 700; letter-spacing: 0.5px;">Active User</div>
+        <div class="user-name" id="current-user-name" style="font-weight: 700; font-size: 0.95rem; color: #ffffff;" th:text="${activeUser?.fullName}">Longki Rongpi</div>
+        <div id="current-user-designation" style="font-size: 0.75rem; color: #cbd5e1; max-width: 220px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;" th:text="${activeUser?.designation}">Executive Member</div>
+      </div>
+      <span class="role-badge" th:classappend="${activeUser?.role != null ? #strings.toLowerCase(activeUser.role.toString()) : ''}" th:text="${activeUser?.role}" style="font-weight: 800; font-size: 0.75rem; letter-spacing: 0.5px; padding: 4px 10px; border-radius: 6px;">ADMIN</span>
+      <a href="/logout" class="btn btn-secondary btn-sm" style="font-size: 0.78rem; padding: 5px 10px; background: rgba(255,255,255,0.15); color: #fff; border: 1px solid rgba(255,255,255,0.25); border-radius: 6px; text-decoration: none;" title="End Active Session">🚪 Logout</a>
+    </div>
+  </div>
+</header>
+
+<nav class="nav-tab-bar">
+  <div class="nav-container">
+    <div class="tab-group">
+      <a href="/" class="nav-btn">🏛️ Meeting Dashboard</a>
+      <a href="/staff/dashboard" class="nav-btn">📋 Staff Dashboard</a>
+      <a href="/departments" class="nav-btn">🏢 Departments</a>
+      <a href="/rooms" class="nav-btn">🏛️ Meeting Rooms</a>
+      <a href="/users" class="nav-btn">👥 Users</a>
+      <a href="/admin/dashboard" class="nav-btn" sec:authorize="hasRole('ADMIN')">⚙️ Admin Console</a>
+    </div>
+  </div>
+</nav>
+
+<main class="app-main" style="max-width: 860px; margin: 0 auto; padding-top: 24px;">
+  <div class="council-card">
+    <div class="card-header">
+      <h3><span>✏️</span> Edit Council Meeting Schedule</h3>
+    </div>
+    <div class="card-body">
+
+      <!-- Post to Update Endpoint -->
+      <form th:action="@{'/meetings/update/' + ${meeting.id}}" method="post">
+
+        <!-- Hidden ID for the update payload -->
+        <input type="hidden" name="id" th:value="${meeting.id}">
+
+        <div class="form-group">
+          <label class="form-label" for="title">Meeting Title / Subject *</label>
+          <input type="text" id="title" name="title" class="form-control" required th:value="${meeting.title}">
+        </div>
+
+        <!-- ROW 1: Department & Meeting Type -->
+        <div class="form-row">
+          <div class="form-group">
+            <label class="form-label" for="department">Council Department *</label>
+            <select id="department" name="departmentId" class="form-control" required>
+              <option th:each="d : ${departments}"
+                      th:value="${d.id}"
+                      th:text="${d.name + ' (' + d.code + ')'}"
+                      th:selected="${meeting.department != null and meeting.department.id == d.id}"></option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="meetingType">Meeting Type *</label>
+            <select id="meetingType" name="meetingType" class="form-control" required>
+              <option value="PHYSICAL" th:selected="${meeting.meetingType == 'PHYSICAL'}">Physical</option>
+              <option value="VIRTUAL" th:selected="${meeting.meetingType == 'VIRTUAL'}">Virtual</option>
+            </select>
+          </div>
+        </div>
+
+        <!-- ROW 2: Physical Room & Virtual Link -->
+        <div class="form-row">
+          <div class="form-group">
+            <label class="form-label" for="meetingRoom">Secretariat Conference Room (If Physical)</label>
+            <select id="meetingRoom" name="meetingRoomId" class="form-control">
+              <option value="">Select Room...</option>
+              <option th:each="r : ${rooms}"
+                      th:value="${r.id}"
+                      th:text="${r.name + ' (' + r.roomNumber + ' - Cap: ' + r.capacity + ')'}"
+                      th:selected="${meeting.meetingRoom != null and meeting.meetingRoom.id == r.id}"></option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="virtualLink">Virtual Link (If Virtual)</label>
+            <input type="text" id="virtualLink" name="virtualLink" class="form-control" th:value="${meeting.virtualLink}">
+          </div>
+        </div>
+
+        <!-- ROW 3: Chairperson & Staff -->
+        <div class="form-row">
+          <div class="form-group">
+            <label class="form-label" for="chairperson">Designated Chairperson * (Role: CHAIRPERSON)</label>
+            <select id="chairperson" name="chairpersonId" class="form-control" required>
+              <option th:each="c : ${chairpersons}"
+                      th:value="${c.id}"
+                      th:text="${c.fullName + ' (' + c.designation + ')'}"
+                      th:selected="${meeting.chairperson != null and meeting.chairperson.id == c.id}"></option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="assignedStaff">Assigned Staff Officer * (Will Handle Meeting)</label>
+            <select id="assignedStaff" name="assignedStaffId" class="form-control" required>
+              <option th:each="s : ${staffMembers}"
+                      th:value="${s.id}"
+                      th:text="${s.fullName + ' (' + s.designation + ')'}"
+                      th:selected="${meeting.assignedStaff != null and meeting.assignedStaff.id == s.id}"></option>
+            </select>
+          </div>
+        </div>
+
+        <!-- ROW 4: Date, Time & Priority -->
+        <div class="form-row">
+          <div class="form-group">
+            <label class="form-label" for="meetingDate">Meeting Date *</label>
+            <input type="date" id="meetingDate" name="meetingDate" class="form-control" required th:value="${meeting.meetingDate}">
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="startTime">Start Time *</label>
+            <input type="time" id="startTime" name="startTime" class="form-control" required th:value="${meeting.startTime}">
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="endTime">End Time *</label>
+            <input type="time" id="endTime" name="endTime" class="form-control" required th:value="${meeting.endTime}">
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="priority">Priority</label>
+            <select id="priority" name="priority" class="form-control">
+              <option value="NORMAL" th:selected="${meeting.priority != null and meeting.priority == 'NORMAL'}">Normal</option>
+              <option value="HIGH" th:selected="${meeting.priority != null and meeting.priority == 'HIGH'}">High Priority</option>
+              <option value="URGENT" th:selected="${meeting.priority != null and meeting.priority == 'URGENT'}">Urgent</option>
+            </select>
+          </div>
+        </div>
+
+        <!-- Edit Specific Row: Status -->
+        <div class="form-group" style="background: #f8fafc; padding: 12px; border: 1px solid #e2e8f0; border-radius: 6px;">
+          <label class="form-label" for="status" style="color: #0f766e;">Meeting Status</label>
+          <select id="status" name="status" class="form-control" style="border-color: #0f766e;">
+            <option value="SCHEDULED" th:selected="${meeting.status != null and meeting.status.name() == 'SCHEDULED'}">Scheduled</option>
+            <option value="IN_PROGRESS" th:selected="${meeting.status != null and meeting.status.name() == 'IN_PROGRESS'}">In Progress</option>
+            <option value="COMPLETED" th:selected="${meeting.status != null and meeting.status.name() == 'COMPLETED'}">Completed</option>
+            <option value="CANCELLED" th:selected="${meeting.status != null and meeting.status.name() == 'CANCELLED'}">Cancelled</option>
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label" for="agenda">Meeting Agenda</label>
+          <textarea id="agenda" name="agenda" class="form-control" rows="3" th:text="${meeting.agenda}"></textarea>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label" for="attendees">Invited Attendees / Council Dignitaries</label>
+          <input type="text" id="attendees" name="attendees" class="form-control" th:value="${meeting.attendees}">
+        </div>
+
+        <div id="conflictAlert" style="display: none; margin-top: 16px; padding: 12px 16px; border-radius: 6px; font-size: 0.9rem;" class="alert alert-danger">
+          <span style="font-size: 1.2rem;">⚠️</span>
+          <span id="conflictMessage"></span>
+        </div>
+
+        <div style="display: flex; justify-content: flex-end; gap: 12px; margin-top: 24px;">
+          <a href="javascript:history.back()" class="btn btn-secondary">Cancel</a>
+          <button type="submit" id="submitBtn" class="btn btn-primary" style="background: #064e3b; border-color: #064e3b;">Update Schedule</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</main>
+
+<script>
+  async function checkConflict() {
+    const type = document.getElementById('meetingType').value;
+    const date = document.getElementById('meetingDate').value;
+    const start = document.getElementById('startTime').value;
+    const end = document.getElementById('endTime').value;
+    const roomId = document.getElementById('meetingRoom').value;
+    const staffId = document.getElementById('assignedStaff').value;
+    const chairpersonId = document.getElementById('chairperson').value;
+    const alertBox = document.getElementById('conflictAlert');
+    const msgBox = document.getElementById('conflictMessage');
+    const submitBtn = document.getElementById('submitBtn');
+
+    // Add meetingId to the query so the backend ignores conflicts with ITSELF during edits
+    const meetingId = document.querySelector('input[name="id"]').value;
+
+    if (!date || !start || !end || !staffId || !chairpersonId || (type === 'PHYSICAL' && !roomId)) {
+      if (alertBox) alertBox.style.display = 'none';
+      if (submitBtn) submitBtn.disabled = false;
+      return;
+    }
+
+    try {
+      const query = new URLSearchParams({
+        date, start, end, roomId, staffId, chairpersonId, meetingId
+      });
+      const res = await fetch(`/staff/check-conflict?${query}`);
+      const data = await res.json();
+
+      if (data.conflict || data.hasConflict) {
+        alertBox.style.display = 'flex';
+        alertBox.className = 'alert alert-danger';
+        msgBox.innerText = data.reason || data.message || 'Scheduling conflict detected!';
+      } else {
+        alertBox.style.display = 'flex';
+        alertBox.className = 'alert alert-success';
+        msgBox.innerText = '✅ Schedule slot is clear! Room, Staff, and Chairperson are available.';
+      }
+    } catch (e) {
+      console.error('Error checking conflicts', e);
+    }
+  }
+
+  ['meetingType', 'meetingDate', 'startTime', 'endTime', 'meetingRoom', 'assignedStaff', 'chairperson'].forEach(id => {
+    const el = document.getElementById(id);
+    if (el) {
+      el.addEventListener('change', checkConflict);
+    }
+  });
+</script>
+</body>
+</html>
