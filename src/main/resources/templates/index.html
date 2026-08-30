@@ -172,6 +172,15 @@
                 <div style="font-size: 0.8rem; color: #64748b;" th:text="${m.startTime + ' - ' + m.endTime}">10:00 - 12:30</div>
               </td>
               <td>
+                <div th:if="${m.meetingType != null and m.meetingType.name() == 'VIRTUAL'}">
+                  <span class="mode-badge-virtual">💻 Virtual</span>
+                </div>
+
+                <!-- Physical Display -->
+                <!-- FIX 2: Removed .name() from meetingType here -->
+                <div th:if="${m.meetingType != null and m.meetingType.name() == 'PHYSICAL'}">
+                  <span class="mode-badge-physical">🏛️ Physical</span>
+                </div>
                 <div style="font-weight: 600;" th:text="${m.meetingRoom.name}">Room</div>
                 <div style="font-size: 0.75rem; color: #64748b;" th:text="${m.meetingRoom.roomNumber}">KAAC-H1</div>
               </td>
@@ -190,14 +199,32 @@
                 <!-- Edit Button: Visible to ADMIN or the Meeting Creator -->
                 <a th:href="@{'/meetings/edit/' + ${m.id}}"
                    class="btn btn-outline btn-sm"
-                   th:if="${activeUser != null and (activeUser.role.toString() == 'ADMIN' or activeUser.id == m.createdBy?.getId())}">Edit</a>
+                   th:if="${activeUser != null and (activeUser.role.toString() == 'ADMIN' or activeUser.id == m.createdBy?.getId()) and m.getStatus().name() == 'SCHEDULED'}">Edit</a>
+
+                <!-- Start Button: Visible to ADMIN or the Meeting Creator -->
+                <form th:action="@{'/meetings/start/' + ${m.id}}"
+                      method="post"
+                      style="display: inline;"
+                      onsubmit="return confirm('Are you sure you want to start this meeting?');"
+                      th:if="${activeUser != null and (activeUser.role.toString() == 'ADMIN' or activeUser.id == m.createdBy?.getId()) and m.getStatus().name() == 'SCHEDULED' }">
+                  <button type="submit" class="btn btn-primary btn-sm">Start</button>
+                </form>
+
+                <!-- End Button: Visible to ADMIN or the Meeting Creator -->
+                <form th:action="@{'/meetings/end/' + ${m.id}}"
+                      method="post"
+                      style="display: inline;"
+                      onsubmit="return confirm('Are you sure you want to end this meeting?');"
+                      th:if="${activeUser != null and (activeUser.role.toString() == 'ADMIN' or activeUser.id == m.createdBy?.getId()) and m.getStatus().name() == 'IN_PROGRESS'}">
+                  <button type="submit" class="btn btn-danger btn-sm">End</button>
+                </form>
 
                 <!-- Cancel Button Form: Visible to ADMIN or the Meeting Creator -->
                 <form th:action="@{'/meetings/cancel/' + ${m.id}}"
                       method="post"
                       style="display: inline;"
                       onsubmit="return confirm('Are you sure you want to cancel this meeting?');"
-                      th:if="${activeUser != null and (activeUser.role.toString() == 'ADMIN' or activeUser.id == m.createdBy?.getId())}">
+                      th:if="${activeUser != null and (activeUser.role.toString() == 'ADMIN' or activeUser.id == m.createdBy?.getId()) and m.getStatus().name() == 'SCHEDULED'}">
                   <button type="submit" class="btn btn-danger btn-sm">Cancel</button>
                 </form>
               </td>

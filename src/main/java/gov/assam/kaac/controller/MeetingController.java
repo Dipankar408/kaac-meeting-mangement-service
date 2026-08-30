@@ -125,4 +125,38 @@ public class MeetingController {
         // Route to the new dedicated view
         return "meeting/edit";
     }
+
+    @PostMapping("/start/{id}")
+    public String startMeeting(@PathVariable Long id, @AuthenticationPrincipal org.springframework.security.core.userdetails.User springUser) {
+
+        User currentUser = null;
+        if (springUser != null) {
+            currentUser = userRepository.findByUsername(springUser.getUsername()).orElse(null);
+        }
+
+        // Fallback user matching your existing pattern
+        if (currentUser == null) {
+            currentUser = userRepository.findById(5L).orElseThrow();
+        }
+
+        meetingService.startMeeting(id, currentUser);
+        return "redirect:/?updated=true";
+    }
+
+    @PostMapping("/end/{id}")
+    public String endMeeting(@PathVariable Long id, @AuthenticationPrincipal org.springframework.security.core.userdetails.User springUser) {
+
+        User currentUser = null;
+        if (springUser != null) {
+            currentUser = userRepository.findByUsername(springUser.getUsername()).orElse(null);
+        }
+
+        // Fallback user matching your existing pattern
+        if (currentUser == null) {
+            currentUser = userRepository.findById(5L).orElseThrow();
+        }
+
+        meetingService.endMeeting(id, currentUser);
+        return "redirect:/?updated=true";
+    }
 }

@@ -8,6 +8,8 @@ import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDate;
+import java.time.LocalTime;
 import java.util.List;
 import java.util.Optional;
 
@@ -92,7 +94,7 @@ public class MeetingService {
                 .chairperson(chair)
                 .assignedStaff(staff)
                 .createdBy(currentUser)
-                .status(MeetingStatus.SCHEDULED)
+                .status(meetingDto.getStatus())
                 .agenda(meetingDto.getAgenda())
                 .attendees(meetingDto.getAttendees())
                 .decisionNotes(meetingDto.getDecisionNotes())
@@ -177,5 +179,36 @@ public class MeetingService {
         }
 
         scheduleRepository.delete(existing);
+    }
+
+    @Transactional
+    public void startMeeting(Long id, User currentUser) {
+        MeetingSchedule existing = scheduleRepository.findById(id)
+                .orElseThrow(() -> new IllegalArgumentException("Meeting schedule not found with id: " + id));
+
+        // Authorization check: ADMIN can delete all. STAFF and CHAIRPERSON can ONLY delete meetings created by them.
+        if (currentUser.getRole() != Role.ADMIN && !existing.getCreatedBy().getId().equals(currentUser.getId())) {
+            throw new AccessDeniedException("Unauthorized: You can only delete meetings created by you.");
+        }
+
+        existing.setStatus(MeetingStatus.IN_PROGRESS);
+        existing.setStartTime(LocalTime.now());
+        existing.setMeetingDate(LocalDate.now());
+        scheduleRepository.save(existing);
+    }
+
+    @Transactional
+    public void endMeeting(Long id, User currentUser) {
+        MeetingSchedule existing = scheduleRepository.findById(id)
+                .orElseThrow(() -> new IllegalArgumentException("Meeting schedule not found with id: " + id));
+
+        // Authorization check: ADMIN can delete all. STAFF and CHAIRPERSON can ONLY delete meetings created by them.
+        if (currentUser.getRole() != Role.ADMIN && !existing.getCreatedBy().getId().equals(currentUser.getId())) {
+            throw new AccessDeniedException("Unauthorized: You can only delete meetings created by you.");
+        }
+
+        existing.setStatus(MeetingStatus.COMPLETED);
+        existing.setEndTime(LocalTime.now());
+        scheduleRepository.save(existing);
     }
 }
