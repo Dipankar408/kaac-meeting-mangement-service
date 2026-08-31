@@ -43,20 +43,22 @@ public class StaffController {
 
         // 3. Calculate summary metrics for the top cards
         List<User> staffMembers = userRepository.findByRoleAndStatus(Role.STAFF, "ACTIVE");
-        Map<Long, Long> assignedCounts = new HashMap<>();
+        Map<Long, Long> completedCounts = new HashMap<>();
         Map<Long, Long> activeDatesCounts = new HashMap<>();
 
         for (User staff : staffMembers) {
             // NOTE: Change getCreatedById() to getAssignedStaff() if your entity is different
             List<MeetingSchedule> staffMeetings = allMeetings.stream()
-                    .filter(m -> m.getCreatedBy() != null && m.getCreatedBy().getId().equals(staff.getId()))
+                    .filter(m -> MeetingStatus.COMPLETED.equals(m.getStatus())
+                            && m.getAssignedStaff() != null
+                            && m.getAssignedStaff().getId().equals(staff.getId()))
                     .toList();
 
-            assignedCounts.put(staff.getId(), (long) staffMeetings.size());
+            completedCounts.put(staff.getId(), (long) staffMeetings.size());
 
             long uniqueDates = staffMeetings.stream()
                     .map(MeetingSchedule::getMeetingDate)
-                    .filter(Objects::nonNull)
+                    .filter(it-> it.equals(LocalDate.now()))
                     .distinct()
                     .count();
             activeDatesCounts.put(staff.getId(), uniqueDates);
@@ -64,8 +66,8 @@ public class StaffController {
 
         model.addAttribute("meetingsByDate", meetingsByDate);
         model.addAttribute("staffMembers", staffMembers);
-        model.addAttribute("assignedCounts", assignedCounts);
-        model.addAttribute("activeDatesCounts", activeDatesCounts);
+        model.addAttribute("totalCompletedCounts", completedCounts);
+        model.addAttribute("todayCompletedCounts", activeDatesCounts);
 
         return "staff/dashboard";
     }

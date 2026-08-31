@@ -194,6 +194,9 @@ public class MeetingService {
         existing.setStatus(MeetingStatus.IN_PROGRESS);
         existing.setStartTime(LocalTime.now());
         existing.setMeetingDate(LocalDate.now());
+        MeetingRoom meetingRoom = existing.getMeetingRoom();
+        meetingRoom.setStatus(RoomStatus.OCCUPIED);
+        existing.setMeetingRoom(meetingRoom);
         scheduleRepository.save(existing);
     }
 
@@ -209,6 +212,9 @@ public class MeetingService {
 
         existing.setStatus(MeetingStatus.COMPLETED);
         existing.setEndTime(LocalTime.now());
+        MeetingRoom meetingRoom = existing.getMeetingRoom();
+        meetingRoom.setStatus(RoomStatus.AVAILABLE);
+        existing.setMeetingRoom(meetingRoom);
         scheduleRepository.save(existing);
     }
 }

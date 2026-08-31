@@ -219,6 +219,7 @@
         </div>
         <a href="/login" class="btn btn-gold" style="font-size: 0.84rem; padding: 7px 14px; text-decoration: none; font-weight: 700; display: inline-flex; align-items: center; gap: 6px;">🔐 Officer Login</a>
       </div>
+    </div>
   </header>
 
   <!-- Navigation Bar -->
@@ -229,7 +230,7 @@
         <a href="/staff/dashboard" class="nav-btn active">📋 Staff Dashboard</a>
         <a href="/departments" class="nav-btn">🏢 Departments</a>
         <a href="/rooms" class="nav-btn">🏛️ Meeting Rooms</a>
-        <a href="/users" class="nav-btn">👥 Users</a>
+<!--        <a href="/users" class="nav-btn">👥 Users</a>-->
         <a href="/admin/dashboard" class="nav-btn" sec:authorize="hasRole('ADMIN')">⚙️ Admin Console</a>
       </div>
       <div class="quick-action-group">
@@ -262,8 +263,8 @@
                th:text="${staff.designation}">Designation</div>
 
           <div style="font-size: 0.82rem; color: #334155; display: flex; gap: 12px;">
-            <span>📋 <strong th:text="${assignedCounts.get(staff.id) ?: 0}">0</strong> Assigned</span>
-            <span>📅 <strong th:text="${activeDatesCounts.get(staff.id) ?: 0}">0</strong> Active Dates</span>
+            <span>📋 <strong th:text="${totalCompletedCounts.get(staff.id)}">0</strong> Completed Overall</span>
+            <span>📋 <strong th:text="${todayCompletedCounts.get(staff.id)}">0</strong> Completed Today</span>
           </div>
         </div>
       </div>

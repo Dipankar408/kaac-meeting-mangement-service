@@ -38,9 +38,10 @@ public class MeetingRoom {
     @Column(length = 300)
     private String facilities;
 
-    @Column(nullable = false, length = 30)
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false, length = 20)
     @Builder.Default
-    private String status = "AVAILABLE";
+    private RoomStatus status = RoomStatus.AVAILABLE;
 
     @Column(length = 500)
     private String description;

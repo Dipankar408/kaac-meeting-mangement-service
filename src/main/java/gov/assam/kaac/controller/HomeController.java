@@ -1,15 +1,15 @@
 package gov.assam.kaac.controller;
 
-import gov.assam.kaac.entity.MeetingSchedule;
-import gov.assam.kaac.entity.MeetingStatus;
-import gov.assam.kaac.entity.MeetingType;
+import gov.assam.kaac.entity.*;
 import gov.assam.kaac.repository.*;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.util.CollectionUtils;
 import org.springframework.web.bind.annotation.GetMapping;
 
 import java.time.LocalDate;
+import java.util.Collections;
 import java.util.List;
 
 @Controller
@@ -47,6 +47,7 @@ public class HomeController {
                 .count();
 
         long totalRooms = roomRepository.count();
+        List<MeetingRoom> availableRoms = roomRepository.findByStatus(RoomStatus.AVAILABLE);
         long totalDepartments = departmentRepository.count();
         long totalUsers = userRepository.count();
 
@@ -56,9 +57,9 @@ public class HomeController {
         model.addAttribute("completedMeetings", completedCount);
         model.addAttribute("completedVirtual", completedVcCount);
         model.addAttribute("completedPhysical", completedPhyCount);
-        model.addAttribute("upcomingToday", upcomingToday > 0 ? upcomingToday : upcomingCount);
-        model.addAttribute("completedToday", completedToday > 0 ? completedToday : completedCount);
-        model.addAttribute("unoccupiedRooms", totalRooms > 0 ? totalRooms : 4);
+        model.addAttribute("upcomingToday", upcomingToday);
+        model.addAttribute("completedToday", completedToday);
+        model.addAttribute("unoccupiedRooms", CollectionUtils.isEmpty(availableRoms) ? 0 : availableRoms.size());
         model.addAttribute("totalDepartments", totalDepartments);
         model.addAttribute("totalRooms", totalRooms);
         model.addAttribute("totalUsers", totalUsers);

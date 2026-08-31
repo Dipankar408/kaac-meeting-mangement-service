@@ -55,6 +55,7 @@
         </div>
         <a href="/login" class="btn btn-gold" style="font-size: 0.84rem; padding: 7px 14px; text-decoration: none; font-weight: 700; display: inline-flex; align-items: center; gap: 6px;">🔐 Officer Login</a>
       </div>
+    </div>
   </header>
 
   <!-- Complete Navigation Bar with all menus -->
@@ -65,7 +66,7 @@
         <a href="/staff/dashboard" class="nav-btn">📋 Staff Dashboard</a>
         <a href="/departments" class="nav-btn">🏢 Departments</a>
         <a href="/rooms" class="nav-btn">🏛️ Meeting Rooms</a>
-        <a href="/users" class="nav-btn">👥 Users</a>
+<!--        <a href="/users" class="nav-btn">👥 Users</a>-->
         <a href="/admin/dashboard" class="nav-btn" sec:authorize="hasRole('ADMIN')">⚙️ Admin Console</a>
       </div>
       <div class="quick-action-group" style="display: flex; gap: 8px; align-items: center;">
@@ -107,7 +108,7 @@
           <div class="form-row">
             <div class="form-group">
               <label class="form-label" for="meetingRoom">Secretariat Conference Room (If Physical)</label>
-              <select id="meetingRoom" name="meetingRoomId" class="form-control">
+              <select id="meetingRoom" name="meetingRoomId" class="form-control" required>
                 <option value="">Select Room...</option>
                 <option th:each="r : ${rooms}" th:value="${r.id}" th:text="${r.name + ' (' + r.roomNumber + ' - Cap: ' + r.capacity + ')'}"></option>
               </select>

@@ -48,7 +48,7 @@
       <a href="/staff/dashboard" class="nav-btn">📋 Staff Dashboard</a>
       <a href="/departments" class="nav-btn">🏢 Departments</a>
       <a href="/rooms" class="nav-btn">🏛️ Meeting Rooms</a>
-      <a href="/users" class="nav-btn">👥 Users</a>
+<!--      <a href="/users" class="nav-btn">👥 Users</a>-->
       <a href="/admin/dashboard" class="nav-btn" sec:authorize="hasRole('ADMIN')">⚙️ Admin Console</a>
     </div>
   </div>
@@ -96,7 +96,7 @@
         <div class="form-row">
           <div class="form-group">
             <label class="form-label" for="meetingRoom">Secretariat Conference Room (If Physical)</label>
-            <select id="meetingRoom" name="meetingRoomId" class="form-control">
+            <select id="meetingRoom" name="meetingRoomId" class="form-control" required>
               <option value="">Select Room...</option>
               <option th:each="r : ${rooms}"
                       th:value="${r.id}"
