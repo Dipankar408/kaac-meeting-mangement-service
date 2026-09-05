@@ -88,7 +88,7 @@
       <!-- CHANGED: repeat(6, 1fr) forces 6 columns in a single line, overflow-x adds smooth responsiveness -->
       <div class="metrics-grid" style="display: grid; grid-template-columns: repeat(6, 1fr); gap: 12px; margin-bottom: 20px; overflow-x: auto; padding-bottom: 4px;">
 
-        <div class="metric-card" style="min-width: 150px;">
+        <div class="metric-card blue" style="min-width: 150px;">
           <div class="metric-icon gold">⏳</div>
           <div class="metric-details">
             <div class="num" id="metric-upcoming-today" th:text="${upcomingToday}">2</div>
@@ -105,7 +105,7 @@
         </div>
 
         <div class="metric-card" style="min-width: 150px;">
-          <div class="metric-icon blue">✅</div>
+          <div class="metric-icon green">✅</div>
           <div class="metric-details">
             <div class="num" id="metric-completed-meetings" th:text="${completedMeetings}">4</div>
             <div class="label">Meetings Completed Overall</div>
@@ -113,23 +113,23 @@
         </div>
 
         <div class="metric-card" style="min-width: 150px;">
-          <div class="metric-icon blue">✅</div>
+          <div class="metric-icon green">✅</div>
           <div class="metric-details">
             <div class="num" id="metric-completed-virtual" th:text="${completedVirtual}">4</div>
-            <div class="label">Virtual Completed Overall</div>
+            <div class="label">Virtual Meetings Completed Overall</div>
           </div>
         </div>
 
         <div class="metric-card" style="min-width: 150px;">
-          <div class="metric-icon blue">✅</div>
+          <div class="metric-icon green">✅</div>
           <div class="metric-details">
             <div class="num" id="metric-completed-physical" th:text="${completedPhysical}">4</div>
-            <div class="label">Physical Completed Overall</div>
+            <div class="label">Physical Meetings Completed Overall</div>
           </div>
         </div>
 
         <div class="metric-card" style="min-width: 150px;">
-          <div class="metric-icon blue">🏛️</div>
+          <div class="metric-icon gold">🏛️</div>
           <div class="metric-details">
             <div class="num" id="metric-unoccupied-rooms" th:text="${unoccupiedRooms}">4</div>
             <div class="label">Active Unoccupied Rooms</div>

@@ -257,7 +257,7 @@
           </div>
           <div>
             <label style="font-size: 0.78rem; font-weight: 700; color: #475569; display: block; margin-bottom: 4px;">Full Name</label>
-            <input type="text" name="fullName" required placeholder="Officer Name" class="form-control" style="font-size: 0.85rem; padding: 6px 10px;">
+            <input type="text" name="fullName" required placeholder="Staff Name" class="form-control" style="font-size: 0.85rem; padding: 6px 10px;">
           </div>
           <div>
             <label style="font-size: 0.78rem; font-weight: 700; color: #475569; display: block; margin-bottom: 4px;">Password</label>
@@ -266,9 +266,9 @@
           <div>
             <label style="font-size: 0.78rem; font-weight: 700; color: #475569; display: block; margin-bottom: 4px;">Role</label>
             <select name="role" class="form-control" style="font-size: 0.85rem; padding: 6px 10px;">
-              <option value="STAFF">STAFF (Protocol / Coordinator)</option>
-              <option value="CHAIRPERSON">CHAIRPERSON (CEM / EM)</option>
-              <option value="ADMIN">ADMIN (Council Secretary)</option>
+              <option value="STAFF">STAFF</option>
+              <option value="CHAIRPERSON">CHAIRPERSON</option>
+              <option value="ADMIN">ADMIN</option>
             </select>
           </div>
           <div>
@@ -281,9 +281,12 @@
           </div>
           <div>
             <label style="font-size: 0.78rem; font-weight: 700; color: #475569; display: block; margin-bottom: 4px;">Department</label>
-            <select name="departmentId" class="form-control" style="font-size: 0.85rem; padding: 6px 10px;" id="user-dept-select">
-              <option value="1">General Administration Department (GAD)</option>
-              <!-- Dept Select Options -->
+            <select name="departmentId" class="form-control" style="font-size: 0.85rem; padding: 6px 10px;">
+              <option value="">No Department</option>
+              <!-- Dynamic Department List for Users -->
+              <option th:each="dept : ${departments}"
+                      th:value="${dept.id}"
+                      th:text="${dept.name}"></option>
             </select>
           </div>
           <div>
@@ -355,9 +358,9 @@
                     <div>
                       <label style="font-size: 0.78rem; font-weight: 700; color: #475569; display: block; margin-bottom: 4px;">Role</label>
                       <select name="role" class="form-control" style="font-size: 0.85rem; padding: 6px 10px;">
-                        <option value="STAFF" th:selected="${u.role != null and u.role.toString() == 'STAFF'}">STAFF (Protocol / Coordinator)</option>
-                        <option value="CHAIRPERSON" th:selected="${u.role != null and u.role.toString() == 'CHAIRPERSON'}">CHAIRPERSON (CEM / EM)</option>
-                        <option value="ADMIN" th:selected="${u.role != null and u.role.toString() == 'ADMIN'}">ADMIN (Council Secretary)</option>
+                        <option value="STAFF" th:selected="${u.role != null and u.role.toString() == 'STAFF'}">STAFF</option>
+                        <option value="CHAIRPERSON" th:selected="${u.role != null and u.role.toString() == 'CHAIRPERSON'}">CHAIRPERSON</option>
+                        <option value="ADMIN" th:selected="${u.role != null and u.role.toString() == 'ADMIN'}">ADMIN</option>
                       </select>
                     </div>
                     <div>

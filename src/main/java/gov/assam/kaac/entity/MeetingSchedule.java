@@ -33,11 +33,11 @@ public class MeetingSchedule {
     private LocalDate meetingDate;
 
     @NotNull(message = "Start time is required")
-    @Column(name = "start_time", nullable = false)
+    @Column(name = "start_time", nullable = false, columnDefinition = "TIME(0) WITHOUT TIME ZONE")
     private LocalTime startTime;
 
     @NotNull(message = "End time is required")
-    @Column(name = "end_time", nullable = false)
+    @Column(name = "end_time", nullable = false, columnDefinition = "TIME(0) WITHOUT TIME ZONE")
     private LocalTime endTime;
 
     @NotNull(message = "Department is required")

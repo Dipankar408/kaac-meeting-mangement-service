@@ -13,10 +13,10 @@ public class KaacMeetingApplication {
     public static void main(String[] args) {
         SpringApplication.run(KaacMeetingApplication.class, args);
         System.out.println("=========================================================================");
-        System.out.println("  🏛️ KAAC Meeting Management System (Spring MVC + H2 DB) Started!     ");
-        System.out.println("  🌐 Web Application: http://localhost:8080                               ");
-        System.out.println("  💾 H2 Database Console: http://localhost:8080/h2-console                ");
-        System.out.println("     JDBC URL: jdbc:h2:mem:kaac_meetings_db | User: sa | Password: password");
+        System.out.println("  🏛️ KAAC Meeting Management System Started!     ");
+        System.out.println("  🌐 Web Application: http://localhost:8080/                               ");
+//        System.out.println("  💾 H2 Database Console: http://localhost:8080/h2-console                ");
+//        System.out.println("     JDBC URL: jdbc:h2:mem:kaac_meetings_db | User: sa | Password: password");
         System.out.println("=========================================================================");
     }
 }
