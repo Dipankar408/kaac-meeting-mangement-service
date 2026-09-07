@@ -84,42 +84,72 @@
     </div>
 
     <!-- Top Metrics Overview -->
-    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 16px; margin-bottom: 24px;">
-      <div class="stat-card" style="background: white; border: 1px solid #e2e8f0; border-radius: 10px; padding: 16px 20px; display: flex; align-items: center; gap: 16px;">
-        <div style="font-size: 2rem;">🏢</div>
-        <div>
-          <div style="font-size: 0.8rem; color: #64748b; font-weight: 700; text-transform: uppercase;">Departments</div>
-          <div id="stat-depts" style="font-size: 1.5rem; font-weight: 800; color: #0f172a;" th:text="${totalDepartments != null ? totalDepartments : departments.size()}">6</div>
+    <div class="admin-metrics-grid">
+      <!-- 1. DEPARTMENTS CARD -->
+      <div class="admin-stat-card theme-depts">
+        <div class="admin-card-main">
+          <div class="admin-card-icon blue">🏢</div>
+          <div class="admin-card-content">
+            <span class="admin-card-label">Departments</span>
+            <div class="admin-card-num" id="stat-depts" th:text="${totalDepartments != null ? totalDepartments : departments.size()}">6</div>
+          </div>
+        </div>
+        <div class="admin-card-footer">
+          <a href="#section-depts" class="admin-card-action">Manage &darr;</a>
         </div>
       </div>
-      <div class="stat-card" style="background: white; border: 1px solid #e2e8f0; border-radius: 10px; padding: 16px 20px; display: flex; align-items: center; gap: 16px;">
-        <div style="font-size: 2rem;">👥</div>
-        <div>
-          <div style="font-size: 0.8rem; color: #64748b; font-weight: 700; text-transform: uppercase;">Council Users</div>
-          <div id="stat-users" style="font-size: 1.5rem; font-weight: 800; color: #0f172a;" th:text="${totalUsers != null ? totalUsers : users.size()}">7</div>
+
+      <!-- 2. COUNCIL USERS CARD -->
+      <div class="admin-stat-card theme-users">
+        <div class="admin-card-main">
+          <div class="admin-card-icon purple">👥</div>
+          <div class="admin-card-content">
+            <span class="admin-card-label">Council Users</span>
+            <div class="admin-card-num" id="stat-users" th:text="${totalUsers != null ? totalUsers : users.size()}">7</div>
+          </div>
+        </div>
+        <div class="admin-card-footer">
+          <a href="#section-users" class="admin-card-action">Manage &darr;</a>
         </div>
       </div>
-      <div class="stat-card" style="background: white; border: 1px solid #e2e8f0; border-radius: 10px; padding: 16px 20px; display: flex; align-items: center; gap: 16px;">
-        <div style="font-size: 2rem;">🏛️</div>
-        <div>
-          <div style="font-size: 0.8rem; color: #64748b; font-weight: 700; text-transform: uppercase;">Meeting Venues</div>
-          <div id="stat-rooms" style="font-size: 1.5rem; font-weight: 800; color: #0f172a;" th:text="${totalRooms != null ? totalRooms : rooms.size()}">4</div>
+
+      <!-- 3. MEETING VENUES CARD -->
+      <div class="admin-stat-card theme-rooms">
+        <div class="admin-card-main">
+          <div class="admin-card-icon green">🏛️</div>
+          <div class="admin-card-content">
+            <span class="admin-card-label">Meeting Venues</span>
+            <div class="admin-card-num" id="stat-rooms" th:text="${totalRooms != null ? totalRooms : rooms.size()}">4</div>
+          </div>
+        </div>
+        <div class="admin-card-footer">
+          <a href="#section-rooms" class="admin-card-action">Manage &darr;</a>
         </div>
       </div>
-      <div class="stat-card" style="background: white; border: 1px solid #e2e8f0; border-radius: 10px; padding: 16px 20px; display: flex; align-items: center; gap: 16px;">
-        <div style="font-size: 2rem;">📅</div>
-        <div>
-          <div style="font-size: 0.8rem; color: #64748b; font-weight: 700; text-transform: uppercase;">Meeting Sessions</div>
-          <div id="stat-meetings" style="font-size: 1.5rem; font-weight: 800; color: #0f172a;" th:text="${totalMeetings != null ? totalMeetings : schedules.size()}">5</div>
+
+      <!-- 4. MEETING SESSIONS CARD -->
+      <div class="admin-stat-card theme-meetings">
+        <div class="admin-card-main">
+          <div class="admin-card-icon amber">📅</div>
+          <div class="admin-card-content">
+            <span class="admin-card-label">Meeting Sessions</span>
+            <div class="admin-card-num" id="stat-meetings" th:text="${totalMeetings != null ? totalMeetings : schedules.size()}">5</div>
+          </div>
+        </div>
+        <div class="admin-card-footer">
+          <span class="admin-card-pill amber">
+            <span>⚡</span> Council Registry
+          </span>
+          <a href="/" class="admin-card-action">View &rarr;</a>
         </div>
       </div>
     </div>
 
     <!-- Quick Navigation Tabs for Admin Sections -->
-    <div style="display: flex; gap: 10px; margin-bottom: 20px; border-bottom: 2px solid #e2e8f0; padding-bottom: 8px;">
-      <a href="#section-depts" class="btn btn-secondary btn-sm" style="text-decoration: none;">🏢 Departments</a>
-      <a href="#section-users" class="btn btn-secondary btn-sm" style="text-decoration: none;">👥 Council Users</a>
-      <a href="#section-rooms" class="btn btn-secondary btn-sm" style="text-decoration: none;">🏛️ Meeting Rooms</a>
+    <div style="display: flex; gap: 8px; margin-bottom: 20px; border-bottom: 1px solid var(--border); padding-bottom: 10px;">
+      <a href="#section-depts" class="btn btn-secondary btn-sm">🏢 Departments</a>
+      <a href="#section-users" class="btn btn-secondary btn-sm">👥 Council Users</a>
+      <a href="#section-rooms" class="btn btn-secondary btn-sm">🏛️ Meeting Rooms</a>
     </div>
 
     <!-- Departments Management -->
