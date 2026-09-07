@@ -7,233 +7,246 @@
   <link rel="stylesheet" th:href="@{/public/css/style.css}" href="/public/css/style.css">
 </head>
 <body>
-  <header class="gov-topbar">
-    <div class="flag-tag">
-      <span>🏛️</span>
-      <span>SIXTH SCHEDULE AUTONOMOUS COUNCIL</span>
-    </div>
-    <div style="display: flex; gap: 16px; align-items: center;">
-      <span>📍 Diphu, Karbi Anglong, Assam</span>
-    </div>
-  </header>
+<header class="gov-topbar">
+  <div class="flag-tag">
+    <span>🏛️</span>
+    <span>SIXTH SCHEDULE AUTONOMOUS COUNCIL</span>
+  </div>
+  <div style="display: flex; gap: 16px; align-items: center;">
+    <span>📍 Diphu, Karbi Anglong, Assam</span>
+  </div>
+</header>
 
-  <header class="main-header">
-    <div class="header-container">
-      <div class="brand-section">
-        <a href="/" style="text-decoration: none; color: inherit; display: flex; align-items: center; gap: 16px;">
-          <div class="council-crest">🏛️</div>
-          <div class="brand-titles">
-            <h1>KARBI ANGLONG AUTONOMOUS COUNCIL</h1>
-            <div class="sub-title">COUNCIL SECRETARIAT • MEETING MANAGEMENT SYSTEM</div>
-          </div>
+<header class="main-header">
+  <div class="header-container">
+    <div class="brand-section">
+      <a href="/" style="text-decoration: none; color: inherit; display: flex; align-items: center; gap: 16px;">
+        <div class="council-crest">🏛️</div>
+        <div class="brand-titles">
+          <h1>KARBI ANGLONG AUTONOMOUS COUNCIL</h1>
+          <div class="sub-title">COUNCIL SECRETARIAT • MEETING MANAGEMENT SYSTEM</div>
+        </div>
+      </a>
+    </div>
+    <!-- Dynamic Session Panel for Authenticated Officer vs Public View Mode -->
+    <div th:if="${activeUser != null}" class="session-panel" style="display: flex; align-items: center; gap: 14px;">
+      <div class="current-user-info" style="text-align: right;">
+        <div style="font-size: 0.72rem; color: #a7f3d0; text-transform: uppercase; font-weight: 700; letter-spacing: 0.5px;">Active User</div>
+
+        <div class="user-name" id="current-user-name" style="font-weight: 700; font-size: 0.95rem; color: #ffffff;"
+             th:text="${activeUser?.fullName}">Longki Rongpi</div>
+
+        <div id="current-user-designation" style="font-size: 0.75rem; color: #cbd5e1; max-width: 220px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;"
+             th:text="${activeUser?.designation}">Executive Member, IT & Council Affairs</div>
+      </div>
+
+      <span class="role-badge"
+            th:classappend="${activeUser?.role != null ? #strings.toLowerCase(activeUser.role.toString()) : ''}"
+            th:text="${activeUser?.role}"
+            id="current-user-role" style="font-weight: 800; font-size: 0.75rem; letter-spacing: 0.5px; padding: 4px 10px; border-radius: 6px;">ADMIN</span>
+
+      <a href="/logout" class="btn btn-secondary btn-sm" style="font-size: 0.78rem; padding: 5px 10px; background: rgba(255,255,255,0.15); color: #fff; border: 1px solid rgba(255,255,255,0.25); border-radius: 6px; text-decoration: none;" title="End Active Session">🚪 Logout</a>
+    </div>
+
+    <div th:if="${activeUser == null}" class="session-panel" style="display: flex; align-items: center; gap: 12px;">
+      <div style="text-align: right;">
+        <div style="font-size: 0.72rem; color: #fde68a; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px;">Public View Mode</div>
+        <div style="font-size: 0.8rem; color: #cbd5e1;">Read-Only Council Registry</div>
+      </div>
+      <a href="/login" class="btn btn-gold" style="font-size: 0.84rem; padding: 7px 14px; text-decoration: none; font-weight: 700; display: inline-flex; align-items: center; gap: 6px;">🔐 Officer Login</a>
+    </div>
+  </div>
+</header>
+
+<!-- Complete Navigation Bar with all menus -->
+<nav class="nav-tab-bar">
+  <div class="nav-container">
+    <div class="tab-group">
+      <a href="/" class="nav-btn active">🏛️ Meeting Dashboard</a>
+      <a href="/staff/dashboard" class="nav-btn">📋 Staff Dashboard</a>
+      <a href="/departments" class="nav-btn">🏢 Departments</a>
+      <a href="/rooms" class="nav-btn">🏛️ Meeting Rooms</a>
+      <!--        <a href="/users" class="nav-btn">👥 Users</a>-->
+      <a href="/admin/dashboard" class="nav-btn" sec:authorize="hasRole('ADMIN')">⚙️ Admin Console</a>
+    </div>
+    <div class="quick-action-group" style="display: flex; gap: 8px; align-items: center;">
+      <a href="/meetings/new" class="btn btn-primary">➕ Schedule Meeting</a>
+    </div>
+  </div>
+</nav>
+
+<main class="app-main">
+  <div class="page-title-row">
+    <div>
+      <h2>🏛️ Council Meetings Dashboard</h2>
+      <p>Master registry of scheduled council meetings, presiding chairpersons, assigned staff coordinators, and venue allocations.</p>
+    </div>
+  </div>
+
+  <!-- METRICS_SECTION_START -->
+  <div id="metrics-summary-section">
+    <!-- CHANGED: repeat(6, 1fr) forces 6 columns in a single line, overflow-x adds smooth responsiveness -->
+    <div class="metrics-grid" style="display: grid; grid-template-columns: repeat(6, 1fr); gap: 12px; margin-bottom: 20px; overflow-x: auto; padding-bottom: 4px;">
+
+      <div class="metric-card theme-upcoming-today">
+        <div class="metric-icon gold">⏳</div>
+        <div class="metric-details">
+          <div class="num" id="metric-upcoming-today" th:text="${upcomingToday}">2</div>
+          <div class="label">Meetings Upcoming Today</div>
+          <span class="metric-pill amber">Today</span>
+        </div>
+      </div>
+
+      <div class="metric-card theme-completed-today">
+        <div class="metric-icon green">✅</div>
+        <div class="metric-details">
+          <div class="num" id="metric-completed-today" th:text="${completedToday}">1</div>
+          <div class="label">Meetings Completed Today</div>
+          <span class="metric-pill green">Concluded</span>
+        </div>
+      </div>
+
+      <div class="metric-card theme-completed-overall" style="min-width: 160px;">
+        <div class="metric-icon blue">📊</div>
+        <div class="metric-details">
+          <div class="num" id="metric-completed-meetings" th:text="${completedMeetings}">4</div>
+          <div class="label">Meetings Completed Overall</div>
+          <span class="metric-pill blue">All Concluded</span>
+        </div>
+      </div>
+
+      <div class="metric-card theme-virtual-completed" style="min-width: 160px;">
+        <div class="metric-icon purple">💻</div>
+        <div class="metric-details">
+          <div class="num" id="metric-completed-virtual" th:text="${completedVirtual}">4</div>
+          <div class="label">Virtual Meetings Completed</div>
+          <span class="metric-pill purple">Virtual</span>
+        </div>
+      </div>
+
+      <div class="metric-card theme-physical-completed" style="min-width: 160px;">
+        <div class="metric-icon teal">🏛️</div>
+        <div class="metric-details">
+          <div class="num" id="metric-completed-physical" th:text="${completedPhysical}">4</div>
+          <div class="label">Physical Meetings Completed</div>
+          <span class="metric-pill teal">Hall Sessions</span>
+        </div>
+      </div>
+
+      <div class="metric-card theme-rooms-available" style="min-width: 160px;">
+        <div class="metric-icon orange">🏢</div>
+        <div class="metric-details">
+          <div class="num" id="metric-unoccupied-rooms" th:text="${unoccupiedRooms}">4</div>
+          <div class="label">Active Unoccupied Rooms</div>
+          <span class="metric-pill orange">Venues Free</span>
+        </div>
+      </div>
+
+    </div>
+  </div>
+  <!-- METRICS_SECTION_END -->
+
+  <!-- Meetings Table -->
+  <div class="council-card">
+    <div class="card-header" style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px;">
+      <h3 style="display: flex; align-items: center; gap: 8px; margin: 0;">
+        <span>📅</span> Master Council Meetings Schedule
+        <span class="meetings-count-header-badge" id="header-meetings-count" th:text="${meetings != null ? '📋 ' + meetings.size() + ' Meetings Scheduled' : '📋 Meetings Scheduled'}">📋 5 Meetings Scheduled</span>
+      </h3>
+      <div style="display: flex; gap: 8px; align-items: center;">
+        <a href="/meetings/new" class="btn btn-primary btn-sm" style="font-size: 0.8rem; padding: 6px 12px; display: inline-flex; align-items: center; gap: 6px;">
+          <span>➕</span> Schedule Meeting
         </a>
       </div>
-      <!-- Dynamic Session Panel for Authenticated Officer vs Public View Mode -->
-      <div th:if="${activeUser != null}" class="session-panel" style="display: flex; align-items: center; gap: 14px;">
-        <div class="current-user-info" style="text-align: right;">
-          <div style="font-size: 0.72rem; color: #a7f3d0; text-transform: uppercase; font-weight: 700; letter-spacing: 0.5px;">Active User</div>
-
-          <div class="user-name" id="current-user-name" style="font-weight: 700; font-size: 0.95rem; color: #ffffff;"
-               th:text="${activeUser?.fullName}">Longki Rongpi</div>
-
-          <div id="current-user-designation" style="font-size: 0.75rem; color: #cbd5e1; max-width: 220px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;"
-               th:text="${activeUser?.designation}">Executive Member, IT & Council Affairs</div>
-        </div>
-
-        <span class="role-badge"
-              th:classappend="${activeUser?.role != null ? #strings.toLowerCase(activeUser.role.toString()) : ''}"
-              th:text="${activeUser?.role}"
-              id="current-user-role" style="font-weight: 800; font-size: 0.75rem; letter-spacing: 0.5px; padding: 4px 10px; border-radius: 6px;">ADMIN</span>
-
-        <a href="/logout" class="btn btn-secondary btn-sm" style="font-size: 0.78rem; padding: 5px 10px; background: rgba(255,255,255,0.15); color: #fff; border: 1px solid rgba(255,255,255,0.25); border-radius: 6px; text-decoration: none;" title="End Active Session">🚪 Logout</a>
-      </div>
-
-      <div th:if="${activeUser == null}" class="session-panel" style="display: flex; align-items: center; gap: 12px;">
-        <div style="text-align: right;">
-          <div style="font-size: 0.72rem; color: #fde68a; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px;">Public View Mode</div>
-          <div style="font-size: 0.8rem; color: #cbd5e1;">Read-Only Council Registry</div>
-        </div>
-        <a href="/login" class="btn btn-gold" style="font-size: 0.84rem; padding: 7px 14px; text-decoration: none; font-weight: 700; display: inline-flex; align-items: center; gap: 6px;">🔐 Officer Login</a>
-      </div>
     </div>
-  </header>
+    <div class="table-responsive">
+      <table class="council-table">
+        <thead>
+        <tr>
+          <th>Status</th>
+          <th>Meeting Title & Department</th>
+          <th>Date & Time</th>
+          <th>Venue / Room</th>
+          <th>Designated Chairperson</th>
+          <th>Assigned Staff Officer</th>
+          <th style="text-align: right;">Actions</th>
+        </tr>
+        </thead>
+        <tbody id="meetings-table-body">
+        <tr th:each="m : ${meetings}">
+          <td>
+            <span class="status-badge" th:classappend="${m.status}" th:text="${m.status}">SCHEDULED</span>
+          </td>
+          <td>
+            <div style="font-weight: 700; color: #1e293b;" th:text="${m.title}">Meeting Title</div>
+            <div style="font-size: 0.8rem; color: #64748b;" th:text="${m.department != null ? m.department.name : 'Department'}">Department</div>
+          </td>
+          <td>
+            <div style="font-weight: 600;" th:text="${m.meetingDate}">2026-09-02</div>
+            <div style="font-size: 0.8rem; color: #64748b;" th:text="${m.startTime + ' - ' + m.endTime}">10:00 - 12:30</div>
+          </td>
+          <td>
+            <div th:if="${m.meetingType != null and m.meetingType.name() == 'VIRTUAL'}">
+              <span class="mode-badge-virtual">💻 Virtual</span>
+            </div>
 
-  <!-- Complete Navigation Bar with all menus -->
-  <nav class="nav-tab-bar">
-    <div class="nav-container">
-      <div class="tab-group">
-        <a href="/" class="nav-btn active">🏛️ Meeting Dashboard</a>
-        <a href="/staff/dashboard" class="nav-btn">📋 Staff Dashboard</a>
-        <a href="/departments" class="nav-btn">🏢 Departments</a>
-        <a href="/rooms" class="nav-btn">🏛️ Meeting Rooms</a>
-<!--        <a href="/users" class="nav-btn">👥 Users</a>-->
-        <a href="/admin/dashboard" class="nav-btn" sec:authorize="hasRole('ADMIN')">⚙️ Admin Console</a>
-      </div>
-      <div class="quick-action-group" style="display: flex; gap: 8px; align-items: center;">
-        <a href="/meetings/new" class="btn btn-primary">➕ Schedule Meeting</a>
-      </div>
+            <!-- Physical Display -->
+            <!-- FIX 2: Removed .name() from meetingType here -->
+            <div th:if="${m.meetingType != null and m.meetingType.name() == 'PHYSICAL'}">
+              <span class="mode-badge-physical">🏛️ Physical</span>
+            </div>
+            <div style="font-weight: 600;" th:text="${m.meetingRoom != null ? m.meetingRoom.name : 'Council Hall'}">Room</div>
+            <div style="font-size: 0.75rem; color: #64748b;" th:text="${m.meetingRoom != null ? m.meetingRoom.roomNumber : 'KAAC-H1'}">KAAC-H1</div>
+          </td>
+          <td>
+            <div style="font-weight: 700; color: #b45309;" th:text="${m.chairperson != null ? m.chairperson.fullName : 'Chairperson'}">Chairperson</div>
+            <div style="font-size: 0.75rem; color: #64748b;" th:text="${m.chairperson != null ? m.chairperson.designation : 'Designation'}">Designation</div>
+          </td>
+          <td>
+            <div style="font-weight: 600; color: #0f766e;" th:text="${m.assignedStaff != null ? m.assignedStaff.fullName : 'Biren Teron'}">Biren Teron</div>
+            <div style="font-size: 0.72rem; color: #64748b;">Staff Coordinator</div>
+          </td>
+          <td style="text-align: right; white-space: nowrap;">
+            <a th:href="@{'/meetings/view/' + ${m.id}}" class="btn btn-secondary btn-sm">View</a>
+            <a th:href="@{'/meetings/notice/' + ${m.id}}" class="btn btn-gold btn-sm">Notice</a>
+
+            <!-- Edit Button: Visible to ADMIN or the Meeting Creator -->
+            <a th:href="@{'/meetings/edit/' + ${m.id}}"
+               class="btn btn-outline btn-sm"
+               th:if="${activeUser != null and (activeUser.role.toString() == 'ADMIN' or activeUser.id == m.createdBy?.getId()) and m.getStatus().name() == 'SCHEDULED'}">Edit</a>
+
+            <!-- Start Button: Visible to ADMIN or the Meeting Creator -->
+            <form th:action="@{'/meetings/start/' + ${m.id}}"
+                  method="post"
+                  style="display: inline;"
+                  onsubmit="return confirm('Are you sure you want to start this meeting?');"
+                  th:if="${activeUser != null and (activeUser.role.toString() == 'ADMIN' or activeUser.id == m.createdBy?.getId()) and m.getStatus().name() == 'SCHEDULED' }">
+              <button type="submit" class="btn btn-primary btn-sm">Start</button>
+            </form>
+
+            <!-- End Button: Visible to ADMIN or the Meeting Creator -->
+            <form th:action="@{'/meetings/end/' + ${m.id}}"
+                  method="post"
+                  style="display: inline;"
+                  onsubmit="return confirm('Are you sure you want to end this meeting?');"
+                  th:if="${activeUser != null and (activeUser.role.toString() == 'ADMIN' or activeUser.id == m.createdBy?.getId()) and m.getStatus().name() == 'IN_PROGRESS'}">
+              <button type="submit" class="btn btn-danger btn-sm">End</button>
+            </form>
+
+            <!-- Cancel Button Form: Visible to ADMIN or the Meeting Creator -->
+            <form th:action="@{'/meetings/cancel/' + ${m.id}}"
+                  method="post"
+                  style="display: inline;"
+                  onsubmit="return confirm('Are you sure you want to cancel this meeting?');"
+                  th:if="${activeUser != null and (activeUser.role.toString() == 'ADMIN' or activeUser.id == m.createdBy?.getId()) and m.getStatus().name() == 'SCHEDULED'}">
+              <button type="submit" class="btn btn-danger btn-sm">Cancel</button>
+            </form>
+          </td>
+        </tr>
+        </tbody>
+      </table>
     </div>
-  </nav>
-
-  <main class="app-main">
-    <div class="page-title-row">
-      <div>
-        <h2>🏛️ Council Meetings Dashboard</h2>
-        <p>Master registry of scheduled council meetings, presiding chairpersons, assigned staff coordinators, and venue allocations.</p>
-      </div>
-    </div>
-
-    <!-- METRICS_SECTION_START -->
-    <div id="metrics-summary-section">
-      <!-- CHANGED: repeat(6, 1fr) forces 6 columns in a single line, overflow-x adds smooth responsiveness -->
-      <div class="metrics-grid" style="display: grid; grid-template-columns: repeat(6, 1fr); gap: 12px; margin-bottom: 20px; overflow-x: auto; padding-bottom: 4px;">
-
-        <div class="metric-card blue" style="min-width: 150px;">
-          <div class="metric-icon gold">⏳</div>
-          <div class="metric-details">
-            <div class="num" id="metric-upcoming-today" th:text="${upcomingToday}">2</div>
-            <div class="label">Meetings Upcoming Today</div>
-          </div>
-        </div>
-
-        <div class="metric-card" style="min-width: 150px;">
-          <div class="metric-icon green">✅</div>
-          <div class="metric-details">
-            <div class="num" id="metric-completed-today" th:text="${completedToday}">1</div>
-            <div class="label">Meetings Completed Today</div>
-          </div>
-        </div>
-
-        <div class="metric-card" style="min-width: 150px;">
-          <div class="metric-icon green">✅</div>
-          <div class="metric-details">
-            <div class="num" id="metric-completed-meetings" th:text="${completedMeetings}">4</div>
-            <div class="label">Meetings Completed Overall</div>
-          </div>
-        </div>
-
-        <div class="metric-card" style="min-width: 150px;">
-          <div class="metric-icon green">✅</div>
-          <div class="metric-details">
-            <div class="num" id="metric-completed-virtual" th:text="${completedVirtual}">4</div>
-            <div class="label">Virtual Meetings Completed Overall</div>
-          </div>
-        </div>
-
-        <div class="metric-card" style="min-width: 150px;">
-          <div class="metric-icon green">✅</div>
-          <div class="metric-details">
-            <div class="num" id="metric-completed-physical" th:text="${completedPhysical}">4</div>
-            <div class="label">Physical Meetings Completed Overall</div>
-          </div>
-        </div>
-
-        <div class="metric-card" style="min-width: 150px;">
-          <div class="metric-icon gold">🏛️</div>
-          <div class="metric-details">
-            <div class="num" id="metric-unoccupied-rooms" th:text="${unoccupiedRooms}">4</div>
-            <div class="label">Active Unoccupied Rooms</div>
-          </div>
-        </div>
-
-
-      </div>
-    </div>
-    <!-- METRICS_SECTION_END -->
-
-    <!-- Meetings Table -->
-    <div class="council-card">
-      <div class="card-header">
-        <h3><span>📅</span> Master Council Meetings Schedule</h3>
-      </div>
-      <div class="table-responsive">
-        <table class="council-table">
-          <thead>
-            <tr>
-              <th>Status</th>
-              <th>Meeting Title & Department</th>
-              <th>Date & Time</th>
-              <th>Venue / Room</th>
-              <th>Designated Chairperson</th>
-              <th>Assigned Staff Officer</th>
-              <th style="text-align: right;">Actions</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr th:each="m : ${meetings}">
-              <td>
-                <span class="status-badge" th:classappend="${m.status}" th:text="${m.status}">SCHEDULED</span>
-              </td>
-              <td>
-                <div style="font-weight: 700; color: #1e293b;" th:text="${m.title}">Meeting Title</div>
-                <div style="font-size: 0.8rem; color: #64748b;" th:text="${m.department.name}">Department</div>
-              </td>
-              <td>
-                <div style="font-weight: 600;" th:text="${m.meetingDate}">2026-09-02</div>
-                <div style="font-size: 0.8rem; color: #64748b;" th:text="${m.startTime + ' - ' + m.endTime}">10:00 - 12:30</div>
-              </td>
-              <td>
-                <div th:if="${m.meetingType != null and m.meetingType.name() == 'VIRTUAL'}">
-                  <span class="mode-badge-virtual">💻 Virtual</span>
-                </div>
-
-                <!-- Physical Display -->
-                <!-- FIX 2: Removed .name() from meetingType here -->
-                <div th:if="${m.meetingType != null and m.meetingType.name() == 'PHYSICAL'}">
-                  <span class="mode-badge-physical">🏛️ Physical</span>
-                </div>
-                <div style="font-weight: 600;" th:text="${m.meetingRoom.name}">Room</div>
-                <div style="font-size: 0.75rem; color: #64748b;" th:text="${m.meetingRoom.roomNumber}">KAAC-H1</div>
-              </td>
-              <td>
-                <div style="font-weight: 700; color: #b45309;" th:text="${m.chairperson.fullName}">Chairperson</div>
-                <div style="font-size: 0.75rem; color: #64748b;" th:text="${m.chairperson.designation}">Designation</div>
-              </td>
-              <td>
-                <div style="font-weight: 600; color: #0f766e;" th:text="${m.assignedStaff != null ? m.assignedStaff.fullName : 'Biren Teron'}">Biren Teron</div>
-                <div style="font-size: 0.72rem; color: #64748b;">Staff Coordinator</div>
-              </td>
-              <td style="text-align: right; white-space: nowrap;">
-                <a th:href="@{'/meetings/view/' + ${m.id}}" class="btn btn-secondary btn-sm">View</a>
-                <a th:href="@{'/meetings/notice/' + ${m.id}}" class="btn btn-gold btn-sm">Notice</a>
-
-                <!-- Edit Button: Visible to ADMIN or the Meeting Creator -->
-                <a th:href="@{'/meetings/edit/' + ${m.id}}"
-                   class="btn btn-outline btn-sm"
-                   th:if="${activeUser != null and (activeUser.role.toString() == 'ADMIN' or activeUser.id == m.createdBy?.getId()) and m.getStatus().name() == 'SCHEDULED'}">Edit</a>
-
-                <!-- Start Button: Visible to ADMIN or the Meeting Creator -->
-                <form th:action="@{'/meetings/start/' + ${m.id}}"
-                      method="post"
-                      style="display: inline;"
-                      onsubmit="return confirm('Are you sure you want to start this meeting?');"
-                      th:if="${activeUser != null and (activeUser.role.toString() == 'ADMIN' or activeUser.id == m.createdBy?.getId()) and m.getStatus().name() == 'SCHEDULED' }">
-                  <button type="submit" class="btn btn-primary btn-sm">Start</button>
-                </form>
-
-                <!-- End Button: Visible to ADMIN or the Meeting Creator -->
-                <form th:action="@{'/meetings/end/' + ${m.id}}"
-                      method="post"
-                      style="display: inline;"
-                      onsubmit="return confirm('Are you sure you want to end this meeting?');"
-                      th:if="${activeUser != null and (activeUser.role.toString() == 'ADMIN' or activeUser.id == m.createdBy?.getId()) and m.getStatus().name() == 'IN_PROGRESS'}">
-                  <button type="submit" class="btn btn-danger btn-sm">End</button>
-                </form>
-
-                <!-- Cancel Button Form: Visible to ADMIN or the Meeting Creator -->
-                <form th:action="@{'/meetings/cancel/' + ${m.id}}"
-                      method="post"
-                      style="display: inline;"
-                      onsubmit="return confirm('Are you sure you want to cancel this meeting?');"
-                      th:if="${activeUser != null and (activeUser.role.toString() == 'ADMIN' or activeUser.id == m.createdBy?.getId()) and m.getStatus().name() == 'SCHEDULED'}">
-                  <button type="submit" class="btn btn-danger btn-sm">Cancel</button>
-                </form>
-              </td>
-            </tr>
-          </tbody>
-        </table>
-      </div>
-    </div>
-  </main>
+  </div>
+</main>
 </body>
 </html>

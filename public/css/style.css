@@ -311,7 +311,7 @@ body {
   margin-top: 2px;
 }
 
-/* Summary Metrics Cards */
+/* Summary Metrics Cards - Vibrant & Polished */
 .metrics-grid {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
@@ -339,69 +339,389 @@ body {
 }
 
 /* Card Theme Variations for Meeting Counts */
-.metric-card.theme-total {
-  background: linear-gradient(135deg, #f0f7ff 0%, #ffffff 100%);
+.metric-card.theme-total,
+.metric-card.theme-completed-overall,
+.metric-card:has(#metric-completed-meetings),
+.metric-card:has(#metric-total-meetings) {
+  background: linear-gradient(135deg, #eff6ff 0%, #ffffff 100%);
   border: 1px solid #bfdbfe;
   border-left: 5px solid #2563eb;
 }
 
-.metric-card.theme-upcoming {
+.metric-card.theme-upcoming,
+.metric-card.theme-upcoming-today,
+.metric-card:has(#metric-upcoming-today) {
   background: linear-gradient(135deg, #fffbeb 0%, #ffffff 100%);
   border: 1px solid #fde68a;
   border-left: 5px solid #d97706;
 }
 
-
-.metric-card:hover {
-  transform: translateY(-2px);
-  box-shadow: var(--shadow-md);
-}
-
-.metric-icon {
-  width: 48px;
-  height: 48px;
-  border-radius: var(--radius-md);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 1.5rem;
-  flex-shrink: 0;
-}
-
-.metric-card.theme-active {
+.metric-card.theme-active,
+.metric-card.theme-physical-completed,
+.metric-card:has(#metric-completed-physical),
+.metric-card:has(#metric-inprogress-today) {
   background: linear-gradient(135deg, #f0fdfa 0%, #ffffff 100%);
   border: 1px solid #99f6e4;
   border-left: 5px solid #0d9488;
 }
 
-.metric-card.theme-completed {
+.metric-card.theme-completed,
+.metric-card.theme-completed-today,
+.metric-card:has(#metric-completed-today) {
   background: linear-gradient(135deg, #f0fdf4 0%, #ffffff 100%);
   border: 1px solid #bbf7d0;
   border-left: 5px solid #16a34a;
 }
 
-.metric-card.theme-rooms {
+.metric-card.theme-virtual,
+.metric-card.theme-virtual-completed,
+.metric-card:has(#metric-completed-virtual) {
   background: linear-gradient(135deg, #faf5ff 0%, #ffffff 100%);
   border: 1px solid #e9d5ff;
   border-left: 5px solid #9333ea;
 }
 
-.metric-icon.green { background: #dcfce7; color: #166534; }
-.metric-icon.blue { background: #dbeafe; color: #1e40af; }
-.metric-icon.amber { background: #fef3c7; color: #92400e; }
-.metric-icon.purple { background: #f3e8ff; color: #6b21a8; }
+.metric-card.theme-rooms,
+.metric-card.theme-rooms-available,
+.metric-card:has(#metric-unoccupied-rooms) {
+  background: linear-gradient(135deg, #fff7ed 0%, #ffffff 100%);
+  border: 1px solid #fed7aa;
+  border-left: 5px solid #ea580c;
+}
+
+.metric-icon {
+  width: 48px;
+  height: 48px;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.5rem;
+  flex-shrink: 0;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.04);
+}
+
+.metric-icon.blue { background: #dbeafe; color: #1d4ed8; border: 1px solid #bfdbfe; }
+.metric-icon.gold { background: #fef3c7; color: #b45309; border: 1px solid #fde68a; }
+.metric-icon.amber { background: #fef3c7; color: #92400e; border: 1px solid #fde68a; }
+.metric-icon.teal { background: #ccfbf1; color: #0f766e; border: 1px solid #99f6e4; }
+.metric-icon.green { background: #dcfce7; color: #15803d; border: 1px solid #bbf7d0; }
+.metric-icon.purple { background: #f3e8ff; color: #7e22ce; border: 1px solid #e9d5ff; }
+.metric-icon.orange { background: #ffedd5; color: #c2410c; border: 1px solid #fed7aa; }
+
+/* Bold, High-Contrast Colorful Meeting Count Numbers */
+.metric-details {
+  flex: 1;
+  min-width: 0;
+}
 
 .metric-details .num {
-  font-size: 1.6rem;
-  font-weight: 800;
-  color: var(--text-main);
-  line-height: 1.2;
+  font-size: 2rem;
+  font-weight: 900;
+  line-height: 1.1;
+  letter-spacing: -0.5px;
+}
+
+.metric-num-total,
+#metric-completed-meetings {
+  color: #1d4ed8 !important;
+}
+
+.metric-num-upcoming,
+#metric-upcoming-today {
+  color: #b45309 !important;
+}
+
+.metric-num-active,
+#metric-inprogress-today,
+#metric-completed-physical {
+  color: #0f766e !important;
+}
+
+.metric-num-completed,
+#metric-completed-today {
+  color: #15803d !important;
+}
+
+#metric-completed-virtual {
+  color: #7e22ce !important;
+}
+
+.metric-num-rooms,
+#metric-unoccupied-rooms {
+  color: #c2410c !important;
 }
 
 .metric-details .label {
-  font-size: 0.825rem;
-  color: var(--text-muted);
-  font-weight: 500;
+  font-size: 0.72rem;
+  color: #475569;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.4px;
+  margin-top: 2px;
+  margin-bottom: 4px;
+  line-height: 1.25;
+}
+
+/* Category Pill Badges */
+.metric-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 0.68rem;
+  font-weight: 800;
+  padding: 2px 8px;
+  border-radius: 9999px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+.metric-pill.blue {
+  background: #dbeafe;
+  color: #1d4ed8;
+  border: 1px solid #bfdbfe;
+}
+.metric-pill.amber {
+  background: #fef3c7;
+  color: #b45309;
+  border: 1px solid #fde68a;
+}
+.metric-pill.teal {
+  background: #ccfbf1;
+  color: #0f766e;
+  border: 1px solid #99f6e4;
+}
+.metric-pill.green {
+  background: #dcfce7;
+  color: #15803d;
+  border: 1px solid #bbf7d0;
+}
+.metric-pill.purple {
+  background: #f3e8ff;
+  color: #7e22ce;
+  border: 1px solid #e9d5ff;
+}
+.metric-pill.orange {
+  background: #ffedd5;
+  color: #c2410c;
+  border: 1px solid #fed7aa;
+}
+
+/* Mode Badges for Physical vs Virtual Meetings */
+.mode-badge-virtual {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  background: #ede9fe;
+  color: #6d28d9;
+  border: 1px solid #c4b5fd;
+  padding: 2px 8px;
+  border-radius: 9999px;
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.3px;
+  margin-bottom: 4px;
+}
+
+.mode-badge-physical {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  background: #e0f2fe;
+  color: #0369a1;
+  border: 1px solid #bae6fd;
+  padding: 2px 8px;
+  border-radius: 9999px;
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.3px;
+  margin-bottom: 4px;
+}
+
+/* Status Badges */
+.status-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 4px 10px;
+  border-radius: 9999px;
+  font-size: 0.72rem;
+  font-weight: 800;
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+.status-badge.SCHEDULED,
+.status-badge.scheduled {
+  background: #fef3c7;
+  color: #92400e;
+  border: 1px solid #fde68a;
+}
+
+.status-badge.IN_PROGRESS,
+.status-badge.in_progress {
+  background: #ccfbf1;
+  color: #0f766e;
+  border: 1px solid #99f6e4;
+  box-shadow: 0 0 0 2px rgba(20, 184, 166, 0.2);
+}
+
+.status-badge.COMPLETED,
+.status-badge.completed {
+  background: #dcfce7;
+  color: #166534;
+  border: 1px solid #bbf7d0;
+}
+
+.status-badge.CANCELLED,
+.status-badge.cancelled {
+  background: #fee2e2;
+  color: #991b1b;
+  border: 1px solid #fecaca;
+}
+
+/* Header Meeting Count Badge */
+.meetings-count-header-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: linear-gradient(135deg, #1e40af 0%, #2563eb 100%);
+  color: #ffffff;
+  font-size: 0.8rem;
+  font-weight: 800;
+  padding: 4px 12px;
+  border-radius: 9999px;
+  box-shadow: 0 2px 4px rgba(37, 99, 235, 0.25);
+  letter-spacing: 0.3px;
+  vertical-align: middle;
+}
+
+/* Department & Room Meeting Count Pills */
+.dept-meetings-count-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 12px;
+  background: #eff6ff;
+  color: #1e40af;
+  border: 1px solid #bfdbfe;
+  border-radius: 9999px;
+  font-size: 0.82rem;
+  font-weight: 600;
+}
+.dept-meetings-count-pill strong {
+  background: #2563eb;
+  color: #ffffff;
+  padding: 1px 8px;
+  border-radius: 9999px;
+  font-size: 0.82rem;
+  font-weight: 900;
+}
+
+.dept-users-count-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 12px;
+  background: #faf5ff;
+  color: #6b21a8;
+  border: 1px solid #e9d5ff;
+  border-radius: 9999px;
+  font-size: 0.82rem;
+  font-weight: 600;
+}
+.dept-users-count-pill strong {
+  background: #9333ea;
+  color: #ffffff;
+  padding: 1px 8px;
+  border-radius: 9999px;
+  font-size: 0.82rem;
+  font-weight: 900;
+}
+
+.room-meetings-count-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 12px;
+  background: #fffbeb;
+  color: #92400e;
+  border: 1px solid #fde68a;
+  border-radius: 9999px;
+  font-size: 0.82rem;
+  font-weight: 600;
+}
+.room-meetings-count-pill strong {
+  background: #d97706;
+  color: #ffffff;
+  padding: 1px 8px;
+  border-radius: 9999px;
+  font-size: 0.82rem;
+  font-weight: 900;
+}
+
+/* Staff Dashboard Meeting Count Badges */
+.meeting-count-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 10px;
+  border-radius: 9999px;
+  font-size: 0.82rem;
+  font-weight: 600;
+}
+.meeting-count-chip.chip-blue {
+  background: #eff6ff;
+  color: #1e40af;
+  border: 1px solid #bfdbfe;
+}
+.meeting-count-chip.chip-blue strong {
+  background: #2563eb;
+  color: #ffffff;
+  padding: 1px 7px;
+  border-radius: 9999px;
+  font-weight: 800;
+  font-size: 0.78rem;
+}
+.meeting-count-chip.chip-purple {
+  background: #faf5ff;
+  color: #6b21a8;
+  border: 1px solid #e9d5ff;
+}
+.meeting-count-chip.chip-purple strong {
+  background: #9333ea;
+  color: #ffffff;
+  padding: 1px 7px;
+  border-radius: 9999px;
+  font-weight: 800;
+  font-size: 0.78rem;
+}
+
+.date-meetings-count-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: linear-gradient(135deg, #1e40af 0%, #3b82f6 100%);
+  color: #ffffff;
+  font-size: 0.8rem;
+  font-weight: 800;
+  padding: 5px 14px;
+  border-radius: 9999px;
+  letter-spacing: 0.5px;
+  box-shadow: 0 2px 4px rgba(37, 99, 235, 0.25);
+}
+.date-meetings-count-sub {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  background: #eff6ff;
+  color: #1d4ed8;
+  border: 1px solid #bfdbfe;
+  font-size: 0.82rem;
+  font-weight: 700;
+  padding: 2px 8px;
+  border-radius: 6px;
+  margin-left: 4px;
 }
 
 /* Card Containers */

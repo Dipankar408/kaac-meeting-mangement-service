@@ -262,10 +262,20 @@
           <div style="font-size: 0.82rem; color: #64748b; margin-bottom: 6px;"
                th:text="${staff.designation}">Designation</div>
 
-          <div style="font-size: 0.82rem; color: #334155; display: flex; gap: 12px;">
-            <span>📋 <strong th:text="${totalCompletedCounts.get(staff.id)}">0</strong> Completed Overall</span>
-            <span>📋 <strong th:text="${todayCompletedCounts.get(staff.id)}">0</strong> Completed Today</span>
+          <div class="staff-metrics-strip">
+            <span class="staff-metric-pill">
+              <span>📋</span>
+              <span><strong th:text="${totalCompletedCounts != null and totalCompletedCounts.get(staff.id) != null ? totalCompletedCounts.get(staff.id) : 0}">0</strong> Completed Overall</span>
+            </span>
+            <span class="staff-metric-pill highlight">
+              <span>⚡</span>
+              <span><strong th:text="${todayCompletedCounts != null and todayCompletedCounts.get(staff.id) != null ? todayCompletedCounts.get(staff.id) : 0}">0</strong> Completed Today</span>
+            </span>
           </div>
+<!--          <div style="font-size: 0.82rem; color: #334155; display: flex; gap: 12px;">-->
+<!--            <span>📋 <strong th:text="${totalCompletedCounts.get(staff.id)}">0</strong> Completed Overall</span>-->
+<!--            <span>📋 <strong th:text="${todayCompletedCounts.get(staff.id)}">0</strong> Completed Today</span>-->
+<!--          </div>-->
         </div>
       </div>
     </div>
